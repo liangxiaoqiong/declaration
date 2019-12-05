@@ -1,4 +1,7 @@
 # hjun 2018-01-20 12:52:09
+# 数据申报系统、题目管理 hj、zx
+# 后端框架参考-园区。需要引入Include文件、GLOBAL文件、admin.php、index.php、phpinfo.php、super.php、sync.php
+# 远程数据库已失效
 
 /*
 Runtime/
