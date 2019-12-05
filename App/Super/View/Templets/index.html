@@ -1,0 +1,71 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                {$type}  
+                </h3>
+                
+                <if condition="$subcate">
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <span class="navbar-text">模板选择：</span>
+                            <foreach name='vlistFileType' item='v'>
+                            <a href="{:U('index', array('ftype' => $key))}" class="btn btn-sm navbar-btn <eq name='key' value='$ftype'>btn-info<else/>btn-default</eq>">{$v}</a>
+                            </foreach>
+                        </div>
+                    </div>
+                </nav>
+                </if>
+            </div>
+        </div>
+        
+            <div class="layui-box-searchber">
+                <button class="layui-btn layui-btn-small" onclick="goUrl('{:U('add', array('ftype'=>$ftype, 'flag' => 1))}')"><i class="layui-icon">&#xe608;</i> 新建模板[列表/单页]</button>
+                <button class="layui-btn layui-btn-small" onclick="goUrl('{:U('add', array('ftype'=>$ftype, 'flag' => 2))}')"><i class="layui-icon">&#xe608;</i> 新建模板[内容页]</button>
+                <button class="layui-btn layui-btn-small" onclick="goUrl('{:U('add', array('ftype'=>$ftype, 'flag' => 0))}')"><i class="layui-icon">&#xe608;</i> 新建模板[首页]</button>
+                <div class="layui-form-pane">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">{$vlist|count}个模板</label>
+                    </div>
+                </div>
+            </div>
+        	<!--<hr>-->
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th>名称</th>
+                <th>可写</th>
+                <th>发布时间</th>
+                <th class="text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='vlist' item='v'>
+                <tr>
+                    <td>{$v.name}</td>
+                    <td><notempty name="v['write']">是<else/>否</notempty></td>
+                    <td>{$v.mtime|date='Y-m-d H:i:s', ###}</td>
+                    <td class="text-right">
+                    <a href="{:U('edit',array('ftype' => $ftype,'fname' => $v['bname']), '')}" class="layui-btn layui-btn-normal layui-btn-mini">修改</a>
+                    </td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+		</div>	
+	</div>
+    
+</block>

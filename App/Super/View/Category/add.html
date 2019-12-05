@@ -1,0 +1,323 @@
+<extend name="Public:base" />
+<block name="header_js">
+</block>
+
+<block name="content">
+<!--tab标签-->
+<div class="layui-tab layui-tab-brief">
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+            <form method="post" id="form_do" class="layui-form form-container" data-url="{:U('add')}">
+                
+                <div class="layui-tab">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">基本选项</li>
+                        <li>高级设置</li>
+                        <li>权限设置</li>
+                    </ul>
+                    <div class="layui-tab-content">
+                        
+                        <div class="layui-tab-item layui-show">
+                        
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">所属栏目</label>
+                                <div class="layui-input-inline">
+                                    <select name="pid" class="form-control">
+                                        <option value="0">顶级栏目</option>
+                                        <foreach name='cate' item='v'>
+										<option value="{$v.id}" <if condition="$pid eq $v['id']">selected="selected"</if>>{$v.delimiter}{$v.name}</option>
+										</foreach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">内容模型</label>
+                                <div class="layui-input-inline">
+                                    <select name="modelid" class="form-control" lay-filter="modelid">
+                                        <foreach name='mlist' item='v'>
+										<option value="{$v.id}" <if condition="$data['modelid'] eq $v['id']">selected="selected"</if>>{$v.name}</option>
+										</foreach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">栏目名称</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="name" value="" placeholder="栏目名称" class="layui-input" required  lay-verify="required" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">别名(拼音)</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ename" value="" placeholder="别名只能包含字母，数字" class="layui-input" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">链接属性</label>
+                                <div class="layui-input-inline">
+                                    <input type="radio" name="type" value="0" title="内部" checked="checked" lay-filter="linktype" />
+                                    <input type="radio" name="type" value="1" title="外部" lay-filter="linktype" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item layui-hide" id="inputType">
+                                <label class="layui-form-label">外链地址</label>
+                                <div class="layui-input-inline" style="width:30%;">
+                                    <input type="text" name="link" value="" placeholder="外链地址" class="layui-input" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">栏目图片</label>
+                                <div class="layui-input-inline" style="width:30%;">
+                                    <input type="text" name="catpic" value="" placeholder="栏目图片" class="layui-input" id="litpic">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="file" name="myimage" class="layui-upload-file" id="image">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label"></label>
+                                <div class="layui-input-inline" style="width:30%;">
+                                    <div id="litpic_show"></div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">状态</label>
+                                <div class="layui-input-inline">
+                                    <input type="radio" name="status" value="1" title="显示" checked="checked" />
+                                    <input type="radio" name="status" value="0" title="隐藏" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">打开方式</label>
+                                <div class="layui-input-inline">
+                                    <input type="radio" name="target" value="_self" title="默认" checked="checked" />
+                                    <input type="radio" name="target" value="_blank" title="新窗口" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">排序</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="sort" value="1" class="layui-input">
+                                </div>
+                            </div>
+                            
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">包含属性</label>
+                                <div class="layui-input-block">
+                                    <foreach name='proplist' item='v'>
+										<input type="checkbox" name="property[]" id="inputType" value="{$v.id}" title="{$v.name}" />
+                                    </foreach>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="layui-tab-item">
+                            
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">栏目模板</label>
+                                <div class="layui-input-inline">
+                                    <select name="template_list" class="form-control">
+										<foreach name='styleListList' item='v'>
+											<option value="{$v}" <if condition="$data['template_list'] eq $v">selected="selected"</if> >{$v}</option>
+										</foreach>
+									</select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">内容页模板</label>
+                                <div class="layui-input-inline">
+                                    <select name="template_show" id="inputTemplateShow" class="form-control">
+										<foreach name='styleShowList' item='v'>
+										<option value="{$v}" <if condition="$data['template_show'] eq $v">selected="selected"</if> >{$v}</option>
+										</foreach>
+									</select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">Seo标题</label>
+                                <div class="layui-input-inline" style="width:30%;">
+                                    <input type="text" name="seotitle" value="" class="layui-input" placeholder="Seo标题" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">关键词</label>
+                                <div class="layui-input-inline" style="width:30%;">
+                                    <input type="text" name="keywords" value="" class="layui-input" placeholder="关键词" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">栏目描述</label>
+                                <div class="layui-input-inline" style="width:50%;">
+                                    <textarea name="description" class="layui-textarea" placeholder="栏目描述"></textarea>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="layui-tab-item">
+                        
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">管理员组权限</label>
+                                <div class="layui-input-block">
+                                    <table class="layui-table">
+                                      <colgroup>
+                                        <col width="120">
+                                        <col>
+                                      </colgroup>
+                                      <thead>
+                                        <tr class="active">
+                                            <th>管理员组名称</th>
+                                            <th>查看</th>				    
+                                            <th>添加</th>				    
+                                            <th>修改</th>				    
+                                            <th>删除</th>
+                                            <th>移动</th>		    
+                                            <th>回收站</th>	    
+                                            <th>还原</th>	    
+                                            <th>清除</th>
+                                         </tr> 
+                                      </thead>
+                                      <tbody>
+                                        <foreach name='roleList' item='v'>	
+										  <tr>
+										    <td>{$v.name}</td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="index,{$v.id}" /></td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="add,{$v.id}" /></td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="edit,{$v.id}" /></td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="del,{$v.id}" /></td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="move,{$v.id}" /></td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="trach,{$v.id}" /></td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="restore,{$v.id}" /></td>
+										    <td align="center"><input type="checkbox" name="acc_roleid[]" value="clear,{$v.id}" /></td>
+										  </tr>
+										</foreach>
+                                      </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">会员组权限</label>
+                                <div class="layui-input-inline" style="width:20%;">
+                                    <table class="layui-table">
+                                      <colgroup>
+                                        <col width="120">
+                                        <col>
+                                      </colgroup>
+									  <thead>
+										  <tr class="active">
+										    <th>会员组名称</th>
+										    <th>允许访问</th>
+										  </tr>
+									  </thead>
+									  <tbody>
+										  <foreach name='groupList' item='v'>	
+										  <tr>
+										    <td>{$v.name}</td>
+										    <td align="center"><input type="checkbox" name="acc_groupid[]" value="visit,{$v.id}" /></td>
+										  </tr>
+										  </foreach>
+									  </tbody>
+									</table>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                        <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>添加</button>
+                        <button onclick="history.go(-1);" class="layui-btn layui-btn-primary layui-btn-small"><i class="layui-icon">&#xe603;</i>返回</button>
+                    </div>
+                </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+</div>
+<!--<script type="text/javascript" src="__ADMIN__/js/formadd.js"></script>-->
+<script>
+	layui.use(['form','upload','layer','element'],function(){
+		var form = layui.form()
+		,jq = layui.jquery
+		,element = layui.element();
+		
+		//显示or隐藏外链
+		form.on('radio(linktype)', function(data){
+		  if(data.value == '1'){
+			  jq('#inputType').removeClass("layui-hide");
+		  }else{
+			  jq('#inputType').addClass("layui-hide");
+		  }
+		});
+		
+		//模型select联动
+		form.on('select(modelid)', function(data){
+			var styleId = data.value;
+			setStyleSelect(styleId);
+			form.render('select');
+		});
+	  
+	  //上传缩略图
+	  layui.upload({
+		url: "{:U('Public/upload',array('img_flag' => 1))}"
+		,elem:'#image'
+		,before: function(input){
+		  loading = layer.load(2, {
+			shade: [0.2,'#000']
+		  });
+		}
+		,success: function(res){
+			var img = res.info[0].url;//原图
+			var timg = res.info[0].turl;//缩略图
+			layer.close(loading);
+			jq('#litpic').val(img);
+			jq('#litpic_show').html("<img src='"+timg+"' width='100%'>");
+			layer.msg('上传成功！', {icon: 1, time: 1000});
+		}
+	  });
+	  
+	  //提交表单
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	
+	function setStyleSelect(id){
+			var template_list = $("select[name='template_list']");
+        	var template_show = $("select[name='template_show']");        	
+			switch (id){
+				<foreach name='mlist' key='key' item='v'>				
+				case '{$v.id}':
+					template_list.find("option[value='{$v.template_list}']").prop("selected","selected");
+					template_show.find("option[value='{$v.template_show}']").prop("selected","selected");
+				 	break;				 	
+				</foreach>
+			}
+
+		}
+</script>
+</block>

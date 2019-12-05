@@ -1,0 +1,123 @@
+<!--管理员：统计分析/产值分析明细-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="">
+    <div class="table-search">
+      <div class="search-list">
+        <div class="search-list-item">
+          <label>公司性质</label>
+          <el-select v-model="query.company_form">
+            <el-option v-for="type in companyQuery.company_form" :value="type.id" :label="type.item_name"></el-option>
+          </el-select>
+        </div>
+        <div class="search-list-item">
+          <label>所有制形式</label>
+          <el-select v-model="query.capital_form">
+            <el-option v-for="capital in companyQuery.capital_form" :value="capital.id"
+                       :label="capital.item_name"></el-option>
+          </el-select>
+        </div>
+        <div class="search-list-item">
+          <label>是否为高薪企业</label>
+          <el-select v-model="query.is_high_new">
+            <el-option value="" label="请选择"></el-option>
+            <el-option value="0" label="否"></el-option>
+            <el-option value="1" label="是"></el-option>
+          </el-select>
+        </div>
+        <div class="search-list-item" style="display: none">
+          <label>是否为热门企业</label>
+          <el-select v-model="query.is_hot">
+            <el-option value="" label="请选择"></el-option>
+            <el-option value="0" label="否"></el-option>
+            <el-option value="1" label="是"></el-option>
+          </el-select>
+        </div>
+        <div class="search-list-item form-default" style="width: 400px;">
+          <label>所属区域</label>
+          <div class="select-city" style="width: 350px;vertical-align: middle">
+            <div>
+              <select class="form-control" id="province" v-model="query.area_id_1" lay-ignore>
+                <option value="">所在省份</option>
+              </select>
+            </div>
+            <div>
+              <select class="form-control" id="city" v-model="query.area_id_2" lay-ignore>
+                <option value="">所在市</option>
+              </select>
+            </div>
+            <div>
+              <select class="form-control" id="area" v-model="query.area_id_3" lay-ignore>
+                <option value="">所在区</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="search-list-item">
+          <label>开始年份</label>
+          <el-date-picker
+              v-model="query.start_time"
+              type="month"
+              value-format="yyyy-MM"
+              placeholder="请选择开始年份">
+          </el-date-picker>
+        </div>
+        <div class="search-list-item">
+          <label>结束年份</label>
+          <el-date-picker
+              v-model="query.end_time"
+              type="month"
+              @change="changeEndTime"
+              value-format="yyyy-MM"
+              placeholder="请选择结束年份">
+          </el-date-picker>
+        </div>
+        <div class="search-list-item">
+          <label>单位</label>
+          <el-select v-model="query.unit">
+            <el-option value="" label="全部"></el-option>
+            <el-option value="0" label="月"></el-option>
+            <el-option value="1" label="季度"></el-option>
+            <el-option value="2" label="年"></el-option>
+          </el-select>
+        </div>
+      </div>
+      <div class="search-btn">
+        <button type="button" class="btn-default" @click="getTableData({page: 1, limit: 20})">搜索</button>
+        <button type="button" class="btn-default" @click="resetSearch">清空</button>
+        <button type="button" class="btn-default" @click="exportOutputValueDetailData">导出</button>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th>公司名称</th>
+            <th>产值总额</th>
+            <th>出口额总值</th>
+            <th>投资额总值</th>
+            <th>利润总额</th>
+            <th>税收总额</th>
+            <th>申请时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="data in tableData.output_detail_data">
+            <td>{{data.company_name}}</td>
+            <td>{{data.income_output_value}}</td>
+            <td>{{data.export_value}}</td>
+            <td>{{data.investment_value}}</td>
+            <td>{{data.profit_value}}</td>
+            <td>{{data.taxes_value}}</td>
+            <td>{{data.apply_time | formatDate_}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+    </div>
+  </div>
+</block>
+<block name="footer_js">
+  <script src="__CITY_JS__"></script>
+  <script type="text/javascript" src="__ADMIN__/js/DataAnalysis/outputValueDetail.js?v={$V}"></script>
+</block>

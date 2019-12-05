@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="/Data/static/jq/jquery-1.7.2.min.js"></script>
+  <script src="/Data/static/jq_plugins/vue-2.x/vue.js"></script>
+  <script src="/Data/static/jq_plugins/util/AppUtil.dev.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+  <script src="__CITY_JS__"></script>
+  <style>
+    .box {
+      border-width: 2px;
+      border-color: red;
+      border-style: solid;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<!--html-->
+<div class="box" id="app1">
+  <div class="box">
+    <table border="1">
+      <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>地址</th>
+        <th>备注</th>
+        <th>房间数量</th>
+      </tr>
+      <tr v-for="building in list">
+        <td>{{ building.building_id }}</td>
+        <td>{{ building.building_name }}</td>
+        <td>{{ building.province_name }}{{ building.city_name }}{{ building.area_name }}</td>
+        <td>{{ building.remark }}</td>
+        <td>{{ building.room_num }}</td>
+      </tr>
+    </table>
+    <div>
+      <button @click="getBuildingList">获取列表</button>
+    </div>
+    <select id="province"></select>
+    <select id="city"></select>
+    <select id="area"></select>
+    <input type="text" v-model="data.address" placeholder="详细地址">
+    <input type="text" v-model="data.building_name" placeholder="楼宇名称">
+    <input type="text" v-model="data.floor_num" placeholder="楼层数量">
+    <input type="text" v-model="data.room_num" placeholder="房间数量">
+    <input type="text" v-model="data.room_area" placeholder="房间面积">
+    <input type="text" v-model="data.rent_type" placeholder="租金方式 0-按平方 1-按固定">
+    <input type="text" v-model="data.rent_value" placeholder="租金">
+    <div>
+      <button @click="addBuilding">添加楼宇</button>
+    </div>
+    <div>
+      <button @click="addBuilding">编辑楼宇</button>
+    </div>
+    <div>
+      <button @click="getBuilding">获取楼宇</button>
+    </div>
+    <div>
+      <button @click="lodash">lodash</button>
+    </div>
+  </div>
+
+
+  <div class="box">
+    <button @click="addFloor">添加楼层</button>
+    <button @click="updateFloor">编辑楼层</button>
+    <button @click="delFloor">删除楼层</button>
+  </div>
+
+  <div class="box">
+    <button @click="addRoom">添加房间</button>
+    <button @click="updateRoom">编辑房间</button>
+    <button @click="delRoom">删除房间</button>
+  </div>
+
+  <div class="box">
+    <button @click="getLeftData">获取左侧数据</button>
+    <button @click="getRightData">获取右侧数据</button>
+  </div>
+
+  <div class="box">
+    <button @click="diffDate">测试日期函数</button>
+    <button @click="signContract">测试签约</button>
+    <button @click="updateContract">更新合同</button>
+  </div>
+
+  <div class="box">
+    <button @click="testDml">测试DML语句</button>
+  </div>
+
+  <div class="box">
+    <button @click="html2World">html2World</button>
+  </div>
+
+  <div class="box">
+    <button @click="statistics">statistics</button>
+    <button @click="calendar">calendar</button>
+    <button @click="content">content</button>
+  </div>
+
+  <div class="box">
+    <button @click="testMsgBills">testMsgBills</button>
+  </div>
+
+  <div class="box">
+    <input type="file" id="sql">
+    <button @click="uploadSql">uploadSql</button>
+  </div>
+</div>
+
+<script>
+  var ThinkPHP = window.Think = {
+    "ROOT": "__ROOT__",
+    "APP": "__APP__",
+    "PUBLIC": "__PUBLIC__",
+    "DEEP": "{:C('URL_PATHINFO_DEPR')}",
+    "MODEL": ["{:C('URL_MODEL')}", "{:C('URL_CASE_INSENSITIVE')}", "{:C('URL_HTML_SUFFIX')}"],
+    "VAR": ["{:C('VAR_MODULE')}", "{:C('VAR_CONTROLLER')}", "{:C('VAR_ACTION')}"],
+    CODE_SUCCESS: +'{$Think.CODE_SUCCESS}',
+    CODE_REDIRECT: +'{$Think.CODE_REDIRECT}',
+    CODE_ERROR: +'{$Think.CODE_ERROR}',
+    CODE_LOGOUT: +'{$Think.CODE_LOGOUT}',
+    CODE_NOT_FOUND: +'{$Think.CODE_NOT_FOUND}',
+    CODE_LOGIN_SUCCESS: +'{$Think.CODE_LOGIN_SUCCESS}',
+  }
+
+  var vm1 = new Vue({
+    el: '#app1',
+    data: function () {
+      return {
+        data: {
+          "province_id": "",
+          "city_id": "",
+          "area_id": "",
+          "address": "",
+          "building_name": "",
+          "floor_num": "",
+          "room_num": "",
+          "room_area": "",
+          "rent_type": "",
+          "rent_value": ""
+        },
+        isBusy: false,
+        list: [],
+        test: {
+          data: ['1', '2', '3']
+        }
+      };
+    },
+    mounted: function () {
+      setcity('province', 'city', 'area');
+    },
+    methods: {
+      addBuilding: function () {
+        var self = this
+        if (self.isBusy) return;
+        self.isBusy = true
+        self.data.province_id = $("#province").val()
+        self.data.city_id = $("#city").val()
+        self.data.area_id = $("#area").val()
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/addBuilding',
+          type: 'post',
+          data: JSON.stringify(self.data),
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+          alert(result.msg);
+          self.data = result.data;
+        }).catch(function () {
+          self.isBusy = false
+        })
+      },
+
+      getBuilding: function () {
+        var self = this
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/getBuilding',
+          data: {
+            building_id: 9
+          }
+        }).then(function (result) {
+
+        }).catch(function (result) {
+
+        });
+      },
+
+      getBuildingList: function () {
+        var self = this
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/getBuildingList',
+          data: {
+            page: 1,
+            limit: 100,
+          }
+        }).then(function (result) {
+          self.list = result.data
+        })
+      },
+
+      addFloor: function () {
+        var data = {
+          building_id: 10,
+          floor_num: 2,
+          public_coefficient: 1,
+          room_num: 2,
+          room_area: 100.98888,
+          rent_type: 0,
+          rent_value: 50
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/addFloor',
+          type: 'post',
+          data: JSON.stringify(data),
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+
+        })
+      },
+
+      updateFloor: function () {
+        var data = {
+          floor_id: 29,
+          floor_num: 10,
+          public_coefficient: 10,
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/updateFloor',
+          type: 'post',
+          data: JSON.stringify(data),
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+
+        })
+      },
+
+      delFloor: function () {
+        var data = {
+          floor_id: 30,
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/delFloor',
+          type: 'post',
+          data: data,
+        }).then(function (result) {
+
+        })
+      },
+
+      addRoom: function () {
+        var data = {
+          floor_id: 29,
+          room_name: '10004',
+          room_area: '100.88888',
+          rent_type: '1',
+          rent_value: '100.956',
+          room_facility: ['1', '3'],
+          room_desc: '测试2',
+          remark: '测试2',
+          room_status: '0',
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/addRoom',
+          type: 'post',
+          data: JSON.stringify(data),
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+
+        })
+      },
+
+      updateRoom: function () {
+        var data = {
+          room_id: 263,
+          room_name: '10003',
+          room_area: '100.88888',
+          rent_type: '1',
+          rent_value: '5000.956',
+          room_facility: ['1', '3'],
+          room_desc: '测试2',
+          remark: '测试2',
+          room_status: '1',
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/updateRoom',
+          type: 'post',
+          data: JSON.stringify(data),
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+
+        })
+      },
+
+      delRoom: function () {
+        var data = {
+          room_id: 263,
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/delRoom',
+          type: 'post',
+          data: data,
+        }).then(function (result) {
+
+        })
+      },
+
+      getLeftData: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/getLeftData',
+          type: 'get',
+        }).then(function (result) {
+
+        })
+      },
+
+      getRightData: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/getRightData',
+          type: 'get',
+        }).then(function (result) {
+
+        })
+      },
+
+      diffDate: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/testDiffDate',
+          type: 'get',
+        }).then(function (result) {
+
+        })
+      },
+
+      testGetSegmentDateByPeriod: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/testGetSegmentDateByPeriod',
+          type: 'get',
+        }).then(function (result) {
+
+        })
+      },
+
+      signContract: function () {
+        var data = {
+          "room_id": "295", // string,签约的房间ID
+          "customer_name": "hj1", // string,租客名称
+          "customer_mobile": "15805946549", // string,手机号码
+          "leader_name": "黄俊2", // string,负责人姓名
+          "reminder_mobile": "15805946549", // string,接收账单提醒的手机号码
+          "customer_id_type": "0", // string,证件类型 0-身份证 1-护照
+          "customer_id_number": "350322199411047731", // string,证件号码
+          "customer_id_pictures": [],
+          "contract_pictures": [],
+          "remark": "测试合同", // string,合同备注
+          "deposit_num": "1", // string,押数",
+          "deposit": "5000", // string,押金（押数 * 租金 或者自定义）",
+          "pay_type": "0", // string,支付周期 0-月付 1-季付 2-半年付 3-年付 4-其他",
+          "pay_period": "2", // string,周期月数（当pay_type=4时可输入）",
+          "collect_rental_type": "1", // string,收租方式 0-提前日 1-固定日",
+          "advanced_days": "", // string,提前的天数",
+          "fixed_pay_date": "1", // string,固定收租日期（每月的几号）",
+          "segments_info": [
+            {
+              "start_time": "2018-01-15", // string,开始时间，格式： 2018-04-01",
+              "end_time": "2018-01-31", // string,结束时间，格式：2018-12-31",
+              "rent_type": "", // string,租金方式 0-按平方收租 1-按固定额收租",
+              "rent_value": "55", // string,租金值",
+              "month_rental": "", // string,月租金",
+              "total_rental": "", // string,合计租金"
+            },
+            {
+              "start_time": "2018-02-01", // string,开始时间，格式： 2018-04-01",
+              "end_time": "2018-04-30", // string,结束时间，格式：2018-12-31",
+              "rent_type": "", // string,租金方式 0-按平方收租 1-按固定额收租",
+              "rent_value": "60", // string,租金值",
+              "month_rental": "", // string,月租金",
+              "total_rental": "", // string,合计租金"
+            },
+          ],
+          "charging_info": [
+            {
+              "item_id": "3", // string,杂费项ID",
+              "item_name": "卫生费", // string,杂费名称",
+              "charge": "0", // string,收费方式 0-固定每月收费",
+              "fee": "10", // string,费用  元/月"
+            },
+            {
+              "item_id": "4", // string,杂费项ID",
+              "item_name": "水费", // string,杂费名称",
+              "charge": "0", // string,收费方式 0-固定每月收费",
+              "fee": "8", // string,费用  元/月"
+            },
+          ],
+          "qrcode_id": "1", // string,收款二维码ID",
+          "tpl_id": "1", // string,合同模版ID"
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/testSignContract',
+          type: 'post',
+          data: JSON.stringify(data),
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+
+        })
+      },
+
+      updateContract: function () {
+        var data = {
+          "contract_id": "18",
+          "room_id": "295", // string,签约的房间ID
+          "customer_name": "黄俊12", // string,租客名称
+          "customer_mobile": "15805946549", // string,手机号码
+          "leader_name": "黄俊2", // string,负责人姓名
+          "reminder_mobile": "15805946549", // string,接收账单提醒的手机号码
+          "customer_id_type": "0", // string,证件类型 0-身份证 1-护照
+          "customer_id_number": "350322199411047731", // string,证件号码
+          "customer_id_pictures": [],
+          "contract_pictures": [],
+          "remark": "测试合同test", // string,合同备注
+          "deposit_num": "1", // string,押数",
+          "deposit": "5000", // string,押金（押数 * 租金 或者自定义）",
+          "pay_type": "0", // string,支付周期 0-月付 1-季付 2-半年付 3-年付 4-其他",
+          "pay_period": "2", // string,周期月数（当pay_type=4时可输入）",
+          "collect_rental_type": "1", // string,收租方式 0-提前日 1-固定日",
+          "advanced_days": "", // string,提前的天数",
+          "fixed_pay_date": "1", // string,固定收租日期（每月的几号）",
+          "segments_info": [
+            {
+              "start_time": "2018-01-15", // string,开始时间，格式： 2018-04-01",
+              "end_time": "2018-01-31", // string,结束时间，格式：2018-12-31",
+              "rent_type": "", // string,租金方式 0-按平方收租 1-按固定额收租",
+              "rent_value": "55", // string,租金值",
+              "month_rental": "", // string,月租金",
+              "total_rental": "", // string,合计租金"
+            },
+            {
+              "start_time": "2018-02-01", // string,开始时间，格式： 2018-04-01",
+              "end_time": "2018-04-30", // string,结束时间，格式：2018-12-31",
+              "rent_type": "", // string,租金方式 0-按平方收租 1-按固定额收租",
+              "rent_value": "60", // string,租金值",
+              "month_rental": "", // string,月租金",
+              "total_rental": "", // string,合计租金"
+            },
+          ],
+          "charging_info": [
+            {
+              "item_id": "3", // string,杂费项ID",
+              "item_name": "卫生费", // string,杂费名称",
+              "charge": "0", // string,收费方式 0-固定每月收费",
+              "fee": "10", // string,费用  元/月"
+            },
+            {
+              "item_id": "4", // string,杂费项ID",
+              "item_name": "水费", // string,杂费名称",
+              "charge": "0", // string,收费方式 0-固定每月收费",
+              "fee": "8", // string,费用  元/月"
+            },
+          ],
+          "qrcode_id": "1", // string,收款二维码ID",
+          "tpl_id": "1", // string,合同模版ID"
+        }
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/testUpdateContract',
+          type: 'post',
+          data: JSON.stringify(data),
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+
+        })
+      },
+
+      lodash: _.debounce(
+        function () {
+          axios({
+            method: 'get',
+            url: '/test.php?s=/testGetSegmentDateByPeriod'
+          }).then(function (response) {
+          }).catch(function (error) {
+          })
+        },
+        // 这是我们为判定用户停止输入等待的毫秒数
+        200
+      ),
+
+      testDml: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/dml',
+          type: 'post',
+          data: 'a=1',
+          headers: {
+            'Content-type': 'application/json;charset=utf-8'
+          }
+        }).then(function (result) {
+
+        })
+      },
+
+      html2World: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/html2World',
+        }).then(function (result) {
+
+        })
+      },
+
+      statistics: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/statistics',
+        }).then(function (result) {
+
+        })
+      },
+
+      calendar: function () {
+        /*
+          {
+            year: 2017,
+            month: 5,
+            day: 13,
+          }
+         */
+        var query = {}
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/calendar',
+          data: query
+        }).then(function (result) {
+
+        })
+      },
+
+      content: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/content',
+        }).then(function (result) {
+
+        })
+      },
+
+      testMsgBills: function () {
+        AppUtil.ajaxRequest({
+          url: '/test.php?s=/testMsgBills',
+        }).then(function (result) {
+
+        })
+      },
+
+      uploadSql: function () {
+        var form = new FormData();
+        var file = $("#sql")[0].files[0];
+        form.append('file', file);
+        $.ajax({
+          url: '/test.php?s=/testRec',
+          data: form,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+        }).then(function (result) {
+        });
+      },
+
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<script type="x-template" id="member_info_components">
+  <div class="news-content">
+    <div class="news-title">
+      <h1>{{ memberData.member_name }}</h1>
+      <p>{{ memberData.short_name }} - {{ memberData.title_name }}</p>
+    </div>
+    <div class="content-c">
+      <img :src="memberData.logo">
+      <div v-html="memberData.content"></div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.MEMBER_INFO_COMPONENTS = {
+    template: '#member_info_components',
+    props: {
+      memberData: Object
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.dateTime_Str(new Date(value * 1000), 'date');
+      }
+    },
+    data: function () {
+      return {}
+    }
+  }
+</script>

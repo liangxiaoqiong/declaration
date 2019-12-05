@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<document xmlns:bbs="http://www.baidu.com/search/bbs_sitemap.xsd">
+	<webSite>{:C('CFG_WEBURL')}</webSite>
+	<webMaster>{:C('CFG_EMAIL_LOGINNAME')}</webMaster>
+	<updatePeri>24</updatePeri>
+	<updatetime>{$_SERVER.REQUEST_TIME|date='Y-m-d H:i:s',###}<item><link>{:C('CFG_WEBURL')}</link><title>{:C('CFG_WEBNAME')}</title><pubDate>{$_SERVER.REQUEST_TIME|date='Y-m-d H:i:s',###}</pubDate></item></updatetime>
+	<volist name="article" id="vo">
+		<item>
+			<link>{:C('CFG_WEBURL')}{$vo.url}</link>
+			<title>{$vo.title}</title>
+			<pubDate>{$vo.publishtime|date='Y-m-d H:i:s',###}</pubDate>
+		</item>
+	</volist>
+</document>

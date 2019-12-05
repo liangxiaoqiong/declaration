@@ -1,0 +1,51 @@
+<script type="x-template" id="member_list_components">
+  <div>
+    <div class="info-title news-title">
+      <h1>{{ childNav.nav_name }}</h1>
+      <p>{:get_cfg_value('CFG_OFFICIAL_TITLE')}　|　网址：{:get_cfg_value('CFG_WEBURL')}</p>
+    </div>
+    <div class="member-list">
+      <div v-for="list in memberListData">
+        <h4>{{ list.title_name }}</h4>
+        <div class="list-news">
+          <a v-for="member in list.members" class="news"  @click="linkMemberInfo(member)">{{ member.member_name }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.MEMBER_LIST_COMPONENTS = {
+    template: '#member_list_components',
+    props: {
+      childNav: Object,
+      memberListData: Array
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.dateTime_Str(new Date(value * 1000), 'date');
+      }
+    },
+    data: function () {
+      return {}
+    },
+    methods: {
+      //文章列表||会员列表跳转
+      linkMemberInfo: function (list) {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/getMember',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: {member_id: list.member_id},
+          type: 'get',
+          isLoad: false,
+        }).then(function (result) {
+          if(typeof result.data.member_id !== 'undefined'){
+            router.push({ path: 'member-info', query: { mid: list.member_id}})
+          }
+        })
+      },
+    }
+  }
+</script>

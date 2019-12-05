@@ -1,0 +1,35 @@
+<!-- template 表格下分页-->
+<script type="x-template" id="pagination_components">
+  <div class="table-page" v-if="+pagData.total > 0">
+    <el-pagination
+      background
+      :page-size="+pagData.limit"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[5, 10, 15, 20, 30, 40, 50]"
+      :total="+pagData.total"
+      @current-change="pageChange" @size-change="limitChange">
+    </el-pagination>
+  </div>
+</script>
+<script>
+  COMPONENT.PAGINATION = {
+    template: '#pagination_components',
+    components:{},
+    props: {
+      pagData: Object
+    },//接收父级组件参数
+    data: function () {
+      return {}
+    },
+    methods: {
+      pageChange:function (page) {
+        var arr = {page: page, limit: this.pagData.limit}
+        this.$emit('page-event',arr);//调用父组件方法，并传参
+      },
+      limitChange: function (limit) {
+        var arr = {page: this.pagData.page, limit: limit}
+        this.$emit('page-event',arr);//调用父组件方法，并传参
+      }
+    }
+  }
+</script>

@@ -1,0 +1,292 @@
+<script type="x-template" id="com_info_pages">
+  <div class="com-info">
+    <div class="container">
+      <div class="info-left" :class="{'active': temp.leftNavShow}">
+        <span @click="temp.leftNavShow = !temp.leftNavShow"> {{ parentNav.nav_name }} </span>
+        <ul v-if="temp.leftNavShow">
+          <li v-for="leftNav in parentNav.child"
+              :class="{'active': +leftNav.nav_id === +childNav.nav_id}" @click="childNavLink(leftNav)">{{ leftNav.nav_name }}</li>
+        </ul>
+      </div>
+      <div class="info-right">
+        <div class="">
+          <div class="info-breadcrumb">
+            您的位置:
+            <a @click="childNavLink(0)">首页</a>
+            <em>>></em><a @click="childNavLink(parentNav)">{{ parentNav.nav_name }}</a>
+            <em>>></em><a @click="childNavLink(childNav)">{{ childNav.nav_name }}</a>
+            <template v-if="infoData.artData.article_id"><em>>></em>正文</template>
+          </div>
+          <div class="info-breadcrumb-current">{{ childNav.nav_name }}</div>
+        </div>
+        <div class="info-main">
+          <!--region 文章内容-->
+          <template v-if="infoData.artData.article_id">
+            <art-info-components :art-data="infoData.artData"></art-info-components>
+          </template>
+          <!--endregion 文章内容-->
+
+          <!--region 文章列表 start-->
+          <template v-if="+infoData.artListData.total > 0">
+            <art-list-components
+                :page="+queryList.page"
+                :limit="queryList.limit"
+                :child-nav="childNav"
+                :art-list-data="infoData.artListData"
+                @page-event="artPageChange"></art-list-components>
+          </template>
+          <!--endregion 文章列表 end-->
+
+          <!--region 专家团队列表-->
+          <template v-if="+infoData.expertListData.length > 0">
+            <expert-list-components
+                :child-nav="childNav"
+                :exp-list-data="infoData.expertListData"></expert-list-components>
+          </template>
+          <!--endregion 专家团队列表-->
+
+          <!--region 会员类型列表-->
+          <template v-if="+infoData.memberListData.length > 0">
+            <member-list-components
+                :child-nav="childNav" :member-list-data="infoData.memberListData"></member-list-components>
+          </template>
+          <!--endregion 会员类型列表-->
+
+          <!--region 会员详情类型-->
+          <template v-if="infoData.memberData.member_id">
+            <member-info-components :member-data="infoData.memberData"></member-info-components>
+          </template>
+          <!--endregion 会员详情类型-->
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<include file="Index/components/art_info_components"/>
+<include file="Index/components/art_list_components"/>
+<include file="Index/components/expert_list_components"/>
+<include file="Index/components/member_info_components"/>
+<include file="Index/components/member_list_components"/>
+<script>
+  COMPONENT.COM_INFO_PAGES = {
+    template: '#com_info_pages',
+    components: {
+      'art-info-components': COMPONENT.ART_INFO_COMPONENTS,
+      'art-list-components': COMPONENT.ART_LIST_COMPONENTS,
+      'expert-list-components': COMPONENT.EXPERT_LIST_COMPONENTS,
+      'member-info-components': COMPONENT.MEMBER_INFO_COMPONENTS,
+      'member-list-components': COMPONENT.MEMBER_LIST_COMPONENTS,
+    },
+    props: {},
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.dateTime_Str(new Date(value * 1000), 'date');
+      }
+    },
+    watch: {
+      '$route': 'fetchData',
+      '$parent.thisNav.parentNav.nav_id': 'fetchData',
+      '$parent.thisNav.childNav.nav_id': 'fetchData',
+      '$parent.thisArt.article_id': 'fetchData',
+      '$parent.thisMember.member_id': 'fetchData',
+    },
+    data: function () {
+      return {
+        queryList: {
+          nav_id: '',
+          page: typeof this.$route.query.p !== 'undefined' ? this.$route.query.p : 1,
+          limit: 20,
+          article_id: '',//获取文章数据
+          member_id: '',//获取文章数据
+        },//查询条件
+        infoData: {
+          artListData: { total: 0,list: [] },
+          artData: {},
+          expertListData: [],
+          memberListData: {},
+          memberData: {}
+        },//当前界面数据
+        navArr: this.$parent.topNavData.navArr,//顶部导航数据
+        parentNav: this.$parent.thisNav.parentNav,//当前一级导航数据
+        childNav: this.$parent.thisNav.childNav,//当前2级导航数据
+        temp: {
+          leftNavShow: ($(document.body).width() > 1024) ? true : false,//一级导航是否显示，主要针对移动端，PC一直true
+        }
+      }
+    },
+    created: function(){
+      this.fetchData()
+    },
+    methods: {
+      //获取数据==类型 0-单文章类型 1-文章列表类型 2-会员类型 3-专家团队 [4-获取文章数据 5-获取会员数据]
+      fetchData: function(){
+        var self = this
+        self.parentNav = self.$parent.thisNav.parentNav
+        self.childNav = self.$parent.thisNav.childNav
+        if(typeof self.$route.query.nid !== 'undefined'){
+          switch (+self.childNav.nav_type) {
+            case 0:
+            case 3://专家团队
+              self.queryList = {nav_id: self.childNav.nav_id}
+              self.resetInfoData()
+              self.getNavArt()
+              break;
+            case 1:
+              self.queryList = {
+                page: typeof (self.$route.query.p !== 'undefined') ? self.$route.query.p : 1,
+                limit: 20,
+                nav_id: self.childNav.nav_id
+              }
+              self.resetInfoData()
+              self.queryNavArt().then(function (result) {
+                self.infoData.artListData = result.data
+              })
+              break;
+            case 2://会员类型
+              self.queryList = {}
+              self.resetInfoData()
+              self.getMemberTitleData()
+              break;
+            default:
+              break;
+          }
+        }else if(typeof self.$route.query.aid !== 'undefined'){
+          self.resetInfoData()
+          self.infoData.artData = self.$parent.thisArt
+        }else if(typeof self.$route.query.mid !== 'undefined'){
+          self.resetInfoData()
+          self.infoData.memberData = self.$parent.thisMember
+        }
+        $('body,html').animate({scrollTop:0},1)
+      },
+      resetInfoData: function(){
+        var infoData = {
+          artListData: { total: 0,list: [] },
+          artData: {},
+          expertListData: [],
+          memberListData: {},
+          memberData: {}
+        }
+        this.infoData = infoData
+      },
+      //列表分页
+      artPageChange: function(page){
+        var self = this;
+        page: typeof (self.$route.query.p !== 'undefined') ? +self.$route.query.p : 1,
+        self.queryList = {
+          page: page,
+          limit: 10,
+          nav_id: self.childNav.nav_id
+        }
+        self.resetInfoData()
+        self.queryNavArt().then(function (result) {
+          self.infoData.artListData = result.data
+          router.push({ path: 'art-list', query: { nid: self.childNav.nav_id, p: page}})
+        })
+      },
+      //获取单文章类型的导航对应的文章index.php?s=/getNavArt
+      getNavArt: function(){
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/getNavArt',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: {nav_id: self.queryList.nav_id},
+          type: 'get',
+          isLoad: false,
+        }).then(function (result) {
+          self.infoData.artData = result.data
+          self.clickArt(result.data.article_id)
+        })
+      },
+      //阅读文章增加点击量/index.php?s=/clickArt
+      clickArt: function (article_id) {
+        AppUtil.ajaxRequest({
+          url: APP + '/clickArt',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: {article_id: article_id},
+          type: 'get',
+          isLoad: false,
+        })
+      },
+      //获取文章列表类型的导航对应的文章l列表index.php?s=/queryNavArt
+      queryNavArt: function(){
+        var self = this;
+        return AppUtil.ajaxRequest({
+          url: APP + '/queryNavArt',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: self.queryList,
+          type: 'get',
+          isLoad: false,
+        })
+      },
+      //获取会员类型的导航对应的会员数据/index.php?s=/getMemberTitleData
+      getMemberTitleData: function(){
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/getMemberTitleData',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: self.queryList,
+          type: 'get',
+          isLoad: false,
+        }).then(function (result) {
+          self.infoData.memberListData = result.data
+        })
+      },
+      //获取会员数据/index.php?s=/getMember
+      getMember: function(){
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/getMember',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: self.queryList,
+          type: 'get',
+          isLoad: false,
+        }).then(function (result) {
+          self.infoData.data = result.data
+        })
+      },
+      //左侧菜单跳转，面包屑导航跳转
+      childNavLink: function (item, data) {
+        var self = this;
+        if(+item === 0){
+          router.push('/')//首页
+        }else {
+          //左侧+顶部导航栏切换
+          if (typeof item.url !== 'undefined' && item.url !== '') {
+            window.open(item.url)
+          } else {
+            self.$nextTick(function () {
+              var nid = item.nav_id
+              var nav_type = item.nav_type
+              if(+item.pid === 0 && (typeof item.child !== 'undefined') && item.child.length > 0){
+                //默认第一个子级
+                nid = item.child[0].nav_id
+                nav_type = item.child[0].nav_type
+              }
+              switch (+nav_type) {
+                case 0:
+                  router.push({ path: 'art-info', query: { nid: nid}})
+                  break;
+                case 1:
+                  router.push({ path: 'art-list', query: { nid: nid, p: 1}})
+                  break;
+                case 2:
+                  router.push({ path: 'member-list', query: { nid: nid}})
+                  break;
+                case 3:
+                  router.push({ path: 'expert', query: { nid: nid}})
+                  break;
+                default:
+                  break;
+              }
+            })
+          }
+          if(!self.$parent.isPC){
+            self.temp.leftNavShow = false//针对移动端
+          }
+        }
+      },
+    },
+  }
+</script>

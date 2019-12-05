@@ -1,0 +1,164 @@
+{
+  "type": "array",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "company_form": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "^\\d+$"
+    },
+    "area_id_1": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "^\\d+$"
+    },
+    "area_id_2": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "^\\d+$"
+    },
+    "area_id_3": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "^\\d+$"
+    },
+    "is_high_new": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "^[0|1]$"
+    },
+    "capital_form": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "^\\d+$"
+    },
+    "license_no": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "address": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "capital": {
+      "type": [
+        "string",
+        "number"
+      ],
+      "required": true,
+      "pattern": "^\\d+$"
+    },
+    "establishment_time": {
+      "type": "string",
+      "required": true,
+      "pattern": "^\\d{4}[\\/\\-](0?[1-9]|1[012])([\\/\\-](0?[1-9]|[12][0-9]|3[01]))$"
+    },
+    "legal_person": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "lp_mobile": {
+      "type": "string",
+      "required": true,
+      "pattern": "^1[3|4|5|8|9][0-9]\\d{8}$"
+    },
+    "tel": {
+      "type": "string",
+      "required": true,
+      "pattern": "^\\d{3,4}-?\\d{7,8}$"
+    },
+    "email": {
+      "type": "string",
+      "required": true,
+      "pattern": "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"
+    },
+    "introduction": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "license_image": {
+      "type": "string",
+      "required": true,
+      "pattern": "^http(s?):\\/\\/(?:[A-za-z0-9-]+\\.)+[A-za-z]{2,4}(:\\d+)?(?:[\\/\\?#][\\/=\\?%\\-&~`@[\\]':+!\\.#\\w]*)?$"
+    },
+    "apply_fields": {
+      "type": "string",
+      "required": true,
+      "pattern": "^(\\d+,)*\\d+$"
+    },
+    "scope": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "contact_name": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "contact_duty": {
+      "type": "string",
+      "required": true,
+      "pattern": "\\S+"
+    },
+    "contact_mobile": {
+      "type": "string",
+      "required": true,
+      "pattern": "^1[3|4|5|8|9][0-9]\\d{8}$"
+    },
+    "contact_tel": {
+      "type": "string",
+      "required": true,
+      "pattern": "^\\d{3,4}-?\\d{7,8}$"
+    },
+    "contact_fax": {
+      "type": "string",
+      "required": true,
+      "pattern": "^(\\d{3,4}-)?\\d{7,8}$"
+    },
+    "contact_email": {
+      "type": "string",
+      "required": true,
+      "pattern": "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"
+    },
+    "contact_qq": {
+      "type": "string",
+      "required": false,
+      "pattern": "^[0-9]{0,20}$"
+    },
+    "contact_wechat": {
+      "type": "string",
+      "required": false,
+      "pattern": "\\S*"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+# hjun 2018-01-20 12:52:09
+
+/*
+Runtime/
+.idea/
+.svn/
+uploads/
+
+!.gitignore
+!/App
+!/Data
+!/ThinkPHP

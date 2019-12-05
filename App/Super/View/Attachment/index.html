@@ -1,0 +1,70 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                    {$type} 
+                    </h3>
+                </div>
+            </div>
+        	
+            <div style="margin-top:10px;">
+                <blockquote class="layui-elem-quote layui-quote-nm"><i class="layui-icon">&#xe60b;</i> 提示：1、引用数：只统计图片类型的文件，被引用的文件建议不删除。  2、缩略图:只针对图片类型文件。</blockquote>
+            </div>
+        	<!--<hr>-->
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>原文件名称</th>
+                <th>文件地址</th>
+                <th>文件大小</th>
+                <th>缩略图</th>
+                <th>上传时间</th>
+                <th>引用数</th>
+                <th class="text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='vlist' item='v'>
+                <tr>
+                    <td>{$v.id}</td>
+                    <td class="aleft">{$v.title}</td>
+                    <td class="aleft">{$v.filepath}</td>
+                    <td>{$v.filesize}</td>
+                    <td><if condition="$v['haslitpic'] eq 1">有<else/>无</if></td>
+                    <td>{$v.uploadtime|date='Y-m-d H:i:s', ###}</td>
+                    <td><if condition="$v['filetype'] eq 1"><span class="red">{$v.num}</span><else/><span>--</span></if></td>
+                    <td class="text-right">
+                    <if condition="$v['filetype'] eq 1">
+                    <a href="{$upload}{$v.filepath}" target="_blank" class="layui-btn layui-btn-normal layui-btn-mini">预览</a>
+                    <else/>
+                    <a class="layui-btn layui-btn-disabled layui-btn-mini">预览</a>
+                    </if>
+                    
+                    <a href="javascript:;" data-url="{:U('del',array('id' => $v['id']), '')}" class="elementdel layui-btn layui-btn-danger layui-btn-mini">删除</a>
+                    </td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+		</div>	
+        
+	</div>
+    <div class="btable-paged" >
+        <div class="layui-main">
+        	<ul class="pagination">{$page}</ul>
+        </div>
+    </div>
+</block>

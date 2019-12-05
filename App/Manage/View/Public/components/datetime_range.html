@@ -1,0 +1,64 @@
+<script type="x-template" id="datetime_range_components">
+  <div class="temp-time-range">
+    <el-date-picker class="el-piker"
+      size="mini" v-bind="$attrs"
+      v-model="date.time_range"
+      type="datetimerange"
+      value-format="yyyy-MM-dd HH:mm:ss" :default-time="['00:00:00', '23:59:59']"
+      range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间">
+    </el-date-picker>
+    <div class="time-shortcut">
+      <template v-for="type in temp.dateType">
+        <el-button
+          type="text"
+          class="border-hover-primary"
+          @click="timeShortcut(+type.val)">{{type.text}}</el-button>
+      </template>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.DATETIME_RANGE = {
+    template: '#datetime_range_components',
+    model: {
+      prop: 'time_range',
+      event: 'change'
+    },
+    props: {
+      time_range: ''
+    },
+    watch: {
+      'date.time_range': function (newValue) {
+        this.$emit('change', newValue);
+      },
+      'time_range': function (newValue) {
+        if(newValue === ''){
+          this.date.time_range = '';
+        }
+        this.$emit('change', newValue);
+      }
+    },
+    data: function(){
+      return {
+        temp: {
+          dateType: [{text: '今天', val: '1'}, {text: '近7天', val: '7'}, {text: '近30天', val: '30'}, {text: '全部', val: '0'}],
+        },
+        date: {
+          time_range: this.time_range
+        }
+      }
+    },
+    methods: {
+      //时间快捷键
+      timeShortcut: function (type) {
+        var self = this;
+        if(+type === 0){
+          self.date.time_range = '';
+        }else{
+          var time = publicObj.dayToTime(type);
+          self.date.time_range = time;
+        }
+      },
+    }
+  }
+</script>

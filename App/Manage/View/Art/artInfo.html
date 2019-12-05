@@ -1,0 +1,153 @@
+<!--新增||编辑-文章-->
+<script type="x-template" id="art_info">
+  <div class="dialog-default">
+    <div class="dialog-body" style="width: 90%">
+      <div class="dialog-head"><h3>{{ titleName }}</h3><a @click="artData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar link-info ques-set-info">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>文章标题</label>
+              <el-input placeholder="请输入文章标题" v-model="artData.dialogData.article_title"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>所属导航</label>
+              <el-select v-model="artData.dialogData.nav_id">
+                <el-option value="0" label="无"></el-option>
+                <el-option v-for="nav in navList" :value="nav.nav_id" :label="nav.nav_name"></el-option>
+              </el-select>
+            </div>
+            <div class="search-list-item">
+              <label>排序</label>
+              <el-input v-model="artData.dialogData.sort"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>是否显示</label>
+              <el-switch
+                  v-model="artData.dialogData.is_show"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>
+            <div class="search-list-item">
+              <label style="vertical-align: top">文章封面图</label>
+              <div>
+                <div class="upload-template" style="width: 220px;height: 120px;">
+                  <img :src="artData.dialogData.article_img" class="upload-img">
+                  <button class="upload-btn" @click="uploadClick">
+                    <span v-if="artData.dialogData.article_img === ''" class="font-12">请点击上传图片</span>
+                    <span v-else class="font-12">更换图片</span>
+                    <upload-file v-model="artData.dialogData.article_img" ref="upload_file" hidden></upload-file>
+                  </button>
+                </div>
+                <p class="color-grey font-12">建议尺寸：220px * 120px</p>
+              </div>
+            </div>
+            <div class="search-list-item">
+              <label>文章简述</label>
+              <el-input type="textarea" :row="10" placeholder="请输入文章简述" v-model="artData.dialogData.article_desc"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label style="vertical-align: top">文章内容</label>
+              <div>
+                <textarea id="inputContent" style="height:370px; width:100%;" v-u-editor></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitArt">提交</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.all.min.js?v={$V}"></script>
+<script>
+  var ue={};
+  COMPONENT.ART_INFO = {
+    template: '#art_info',
+    components:{
+      'upload-file': COMPONENT.UPLOAD_FILE_COMPONENT
+    },
+    props: {
+      artData: Object,
+      navList: Array
+    },
+    data: function () {
+      return {}
+    },
+    computed: {
+      titleName: function () {
+        return this.artData.dialogType === 'edit' ? '编辑文章' : '新增文章'
+      }
+    },
+    directives: {
+      uEditor: {
+        bind: function (el) {
+          // 实例化ue实例
+          ue = UE.getEditor('inputContent', {
+            serverUrl: uEditor_url,
+          });
+        }
+      }
+    },
+    methods: {
+      loadInit: function(){
+        var self = this;
+        var content = self.artData.dialogData.content ? self.artData.dialogData.content : ''
+        self.$nextTick(function () {
+          ue.ready(function () {
+            ue.setContent(content);//设置编辑器的内容
+          });
+          self.$refs.upload_file.$el.value = ''
+        })
+      },
+      //提交按钮
+      submitArt: function(){
+        var self = this;
+        var content = ue.getContent()
+        self.artData.dialogData.content = content
+        if(self.artData.dialogData.article_img !== ''){
+          if(self.artData.dialogData.article_desc === ''){
+            layer.msg('请输入文章简述', {icon: 2, anim: 6, time: 1000});
+            return false
+          }
+        }
+        self.artData.dialogType === 'edit' ? self.updateArt() : self.addArt()
+      },
+      //新增
+      addArt: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/addArt',
+          data: JSON.stringify(self.artData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('添加成功', {icon: 1, time: 1000});
+          self.artData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      //修改
+      updateArt: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/updateArt',
+          data: JSON.stringify(self.artData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('修改成功', {icon: 1, time: 1000});
+          self.artData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      uploadClick: function () {
+        this.$refs.upload_file.$el.click()
+      }
+    },
+  }
+</script>

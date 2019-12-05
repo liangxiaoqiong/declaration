@@ -1,0 +1,322 @@
+<extend name="Public:base" />
+<block name="header_js">
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.all.min.js"></script>
+<script type="text/javascript">
+$(function(){
+    var ue = UE.getEditor('inputContent',{
+        serverUrl :"{:U('Public/editorMethod')}"
+    });
+})
+</script>
+<script type="text/javascript" src="__PUBLIC__/js/calendar.config.js"></script>
+<script type="text/javascript" src="__DATA__/static/jq_plugins/iColorPicker/iColorPicker.js"></script>
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe654;</i> 
+                添加产品
+                </h3>
+            </div>
+            
+        </div>
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('add')}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称</label>
+                <div class="layui-input-inline" style="width:50%;">
+                    <input type="text" name="title" value="" required lay-verify="required" placeholder="产品名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题颜色</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="color" value="" placeholder="标题颜色" class="layui-input iColorPicker">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">所属栏目</label>
+                <div class="layui-input-inline" style="width:30%;">
+                    <select name="cid" class="form-control">
+                        <volist name="cate" id="v">
+                        <option value="{$v.id}" <if condition="$pid eq $v['id']">selected="selected"</if>>{$v.delimiter}{$v.name}</option>
+                        </volist>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">自定义属性</label>
+                <div class="layui-input-block">
+                    <foreach name='flagtypelist' item='v'>
+                    <input type="checkbox" name="flags[]" value="{$key}" <if condition="$key eq B_JUMP">id="CK_JumpUrl" lay-filter="CK_JumpUrl"</if> lay-skin="primary" title="{$v}" />
+                    </foreach>
+                </div>
+            </div>
+            <div class="layui-form-item" id="JumpUrlDiv" style="display:none;">
+                <label class="layui-form-label">跳转网址</label>
+                <div class="layui-input-inline" style="width:50%;">
+                    <input type="text" name="jumpurl" value="" placeholder="跳转网址" class="layui-input">
+                </div>
+            </div>
+            
+            <!--<div class="layui-form-item">
+                <label class="layui-form-label">封面</label>
+                <div class="layui-input-inline" style="width:30%;">
+                    <input type="text" name="litpic" value="" placeholder="封面" class="layui-input" id="litpic">
+                </div>
+                <div class="layui-input-inline">
+                    <input type="file" name="myimage" class="layui-upload-file" id="image">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <div class="layui-input-inline" style="width:30%;">
+                    <div id="litpic_show"></div>
+                </div>
+            </div>-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品图集</label>
+                <div class="layui-input-inline">
+                    <input type="file" name="myimages" class="layui-upload-file" id="images" lay-title="上传图集">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <div class="layui-input-block">
+                    <div id="picture_show"></div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">关键词</label>
+                <div class="layui-input-inline" style="width:30%;">
+                    <input type="text" name="keywords" value="" placeholder="多关键词之间用“,”隔开" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">价格</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="price" value="" placeholder="价格" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">品牌</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="brand" value="" placeholder="品牌" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">单位</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="units" value="" placeholder="单位" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">规格</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="specification" value="" placeholder="规格" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">摘要</label>
+                <div class="layui-input-inline" style="width:60%">
+                    <textarea name="description" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">内容</label>
+                <div class="layui-input-block">
+                    <textarea name="content" id="inputContent" style="height:370px; width:99%;"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">发布时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="publishtime" value="{:date('Y-m-d H:i:s',time())}" class="layui-input" id="inputPublishtime">
+                    <script type="text/javascript">
+						Calendar.setup({
+							weekNumbers: true,
+							inputField : "inputPublishtime",
+							trigger    : "inputPublishtime",
+							dateFormat: "%Y-%m-%d %H:%M:%S",
+							showTime: true,
+							minuteStep: 1,
+							onSelect   : function() {this.hide();}
+						});
+					</script>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">评论</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="commentflag" value="1" title="允许" checked="checked" />
+                    <input type="radio" name="commentflag" value="0" title="禁止" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">审核</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="status" value="1" title="通过" checked="checked" />
+                    <input type="radio" name="status" value="2" title="禁止" />
+                </div>
+            </div>
+            <div id="add_prop"></div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                    <input type="hidden" name="pid" value="{$pid}" />
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>添加 </button>
+                    <button onclick="history.go(-1);" class="layui-btn layui-btn-primary layui-btn-small"><i class="layui-icon">&#xe603;</i>返回 </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--<script type="text/javascript" src="__ADMIN__/js/formadd.js"></script>-->
+    <script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  	var proids = '{:get_catProperty($pid)}';
+		var prop_value = '{$vo.prop_value}';
+		if(proids != ''){
+			jq.post("{:U('Ajax/get_proplist')}",{ids:proids, prop_value:prop_value},function(data,status){
+				jq('#add_prop').html(data);
+				form.render('checkbox');
+			});
+		}
+	  
+	  //上传缩略图
+	  layui.upload({
+		url: "{:U('Public/upload',array('img_flag' => 1))}"
+		,elem:'#image'
+		,before: function(input){
+		  loading = layer.load(2, {
+			shade: [0.2,'#000']
+		  });
+		}
+		,success: function(res){
+			var img = res.info[0].url;//原图
+			var timg = res.info[0].turl;//缩略图
+			layer.close(loading);
+			jq('#litpic').val(img);
+			jq('#litpic_show').html("<img src='"+timg+"' width='100%'>");
+			layer.msg('上传成功！', {icon: 1, time: 1000});
+		}
+	  });
+	  
+	  //上传图集
+	  layui.upload({
+		url: "{:U('Public/upload',array('img_flag' => 1))}"
+		,elem:'#images'
+		,before: function(input){
+		  loading = layer.load(2, {
+			shade: [0.2,'#000']
+		  });
+		}
+		,success: function(res){
+			var img = res.info[0].url;//原图
+			var timg = res.info[0].turl;//缩略图
+			
+			var alt = res.info[0].name;
+			inum = alt.lastIndexOf('.');
+			altname = alt.substring(0,inum);
+			
+			layer.close(loading);
+			var picnum = jq(".picture_item").length;
+			if(picnum == '' || picnum == 'null'){
+				picnum = 0;
+			}
+			
+			var picture_html= '<div class="picture_item"><img src="'+ timg +'" width="120" height="120" /><div class="picture_del">删除</div><div class="picture_go_up">前移</div><input type="hidden" id="pictureurls_'+picnum+'" name="pictureurls[]" value="'+ img +'$$$'+altname+'" /><input type="text" id="picalt_'+picnum+'" class="picalt"  placeholder="图片描述" value="'+altname+'" onkeyup="changevalue('+picnum+');" /></div>';
+			jq('#picture_show').append(picture_html);
+			layer.msg('上传成功！', {icon: 1, time: 1000});
+		}
+	  });
+	  
+	  //显示or隐藏跳转链接
+	  form.on('checkbox(CK_JumpUrl)', function(data){
+		if(data.elem.checked) {
+			$('#JumpUrlDiv').show();
+		}else {
+			$('#JumpUrlDiv').hide();
+		}
+	  });
+	  
+	  //提交表单
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	
+	$(function () {
+		$('#picture_show').on('mouseenter',".picture_item",function(){
+				$(this).find('.picture_go_up').show();
+				$(this).find('.picture_del').show();
+			}).on('mouseleave',".picture_item",function(){
+				$(this).find('.picture_go_up').hide();
+				$(this).find('.picture_del').hide();
+			}
+		); 
+	
+		$('#picture_show').on('click','.picture_go_up',function () {
+			var parent = $(this).parent();
+			if (parent.index() == 0){
+			}else{
+				parent.prev().before(parent);
+				$(this).hide();
+				parent.find('.picture_del').hide();
+			} 
+			
+		});
+	
+		$('#picture_show').on('click','.picture_del',function () {
+			var img = $(this).next().val();//下个元素input的值 
+			$(this).parent().remove();////移除父元素
+				   
+		});
+	});
+	function changevalue(k){
+		var picurl = $("#pictureurls_"+k).val();
+		var picalt = $("#picalt_"+k).val();
+		
+		if(picurl.indexOf('$$$')){
+			arrypic = picurl.split('$$$');
+			$("#pictureurls_"+k).val(arrypic[0]+'$$$'+picalt);
+		}else{
+			$("#pictureurls_"+k).val(picurl+'$$$'+picalt);
+		}
+		
+	}
+	
+	</script>
+</block>

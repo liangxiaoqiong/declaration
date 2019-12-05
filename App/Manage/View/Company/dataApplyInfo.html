@@ -1,0 +1,88 @@
+<!--查看-数据填报-->
+<script type="x-template" id="my_apply_info">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>数据申报</h3><a @click="myApplyData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar declare-info">
+        <i :class="'audit-status__'+myApplyData.dialogData.audit_status"></i>
+        <div class="data-info">
+          <dl>
+            <dd>
+              <div>
+                <span>申报时间:{{ myApplyData.dialogData.apply_time | formatMouth }}</span>
+                <span>创建时间:{{ myApplyData.dialogData.create_time | formatDate }}</span>
+              </div>
+            </dd>
+          </dl>
+          <dl>
+            <dt>财务数据申报</dt>
+            <dd>
+              <div>
+                <span>营业收入产值(万元):{{ myApplyData.dialogData.income_output_value }}</span>
+                <span>出口额总值(万元):{{ myApplyData.dialogData.export_value }}</span>
+              </div>
+              <div>
+                <span>投资额总价(万元):{{ myApplyData.dialogData.investment_value }}</span>
+                <span>利润总额(万元):{{ myApplyData.dialogData.profit_value }}</span>
+              </div>
+              <div><span>纳税总额(万元):{{ myApplyData.dialogData.taxes_value }}</span></div>
+            </dd>
+          </dl>
+          <dl>
+            <dt>研发情况申报</dt>
+            <dd>
+              <div>
+                <span>本月研发人员数:{{ myApplyData.dialogData.dev_people_value }}</span>
+                <span>发明专利:{{ myApplyData.dialogData.invention_patent_value }}</span>
+              </div>
+              <div>
+                <span>实用新型专利:{{ myApplyData.dialogData.utility_patent_value }}</span>
+                <span>外观设计专利:{{ myApplyData.dialogData.facade_patent_value }}</span>
+              </div>
+              <div>
+                <span>软件著作权:{{ myApplyData.dialogData.software_copyright_value }}</span>
+                <span>其他:{{ myApplyData.dialogData.other_value }}</span>
+              </div>
+              <div v-if="+myApplyData.dialogData.audit_status === 2">
+                <label><span>拒绝原因：</span><font>{{ myApplyData.dialogData.audit_reason }}</font></label>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="myApplyData.showDialog = false">确定</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.MY_APPLY_INFO = {
+    template: '#my_apply_info',
+    components:{},
+    props: {
+      myApplyData: Object
+    },
+    data: function () {
+      return {}
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.formatDate(new Date(value * 1000));
+      },
+      formatMouth: function (value) {
+        return publicObj.dateTime_Str((new Date(+value * 1000)), 'mouth');
+      }
+    },
+    methods: {
+      getDataApply: function () {
+        var self = this;
+        return AppUtil.ajaxRequest({
+          url: APP + '/getDataApply',
+          data: {data_id: self.myApplyData.dialogData.data_id},
+        })
+      }
+    }
+  }
+</script>

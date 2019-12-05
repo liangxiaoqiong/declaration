@@ -1,0 +1,94 @@
+<!--新增||编辑-链接-->
+<script type="x-template" id="link_info">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>{{ titleName }}</h3><a @click="linkData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar link-info ques-set-info">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>链接名称</label>
+              <el-input placeholder="请输入链接名称" v-model="linkData.dialogData.link_name"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>链接地址</label>
+              <el-input placeholder="请输入链接地址" v-model="linkData.dialogData.link_url"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>排序</label>
+              <el-input v-model="linkData.dialogData.sort"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>是否显示</label>
+              <el-switch
+                  v-model="linkData.dialogData.is_show"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitLink">提交</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.LINK_INFO = {
+    template: '#link_info',
+    components:{},
+    props: {
+      linkData: {}
+    },
+    data: function () {
+      return {}
+    },
+    computed: {
+      titleName: function () {
+        return this.linkData.dialogType === 'edit' ? '编辑链接' : '新增链接'
+      }
+    },
+    methods: {
+      //提交按钮
+      submitLink: function(){
+        var self = this;
+        var pattern = /^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/;
+        if(!pattern.test(self.linkData.dialogData.link_url)){
+          layer.msg('链接必须以http或https开头', {icon: 2, anim: 6, time: 1000});
+          return false;
+        }
+        self.linkData.dialogType === 'edit' ? self.updateLink() : self.addLink()
+      },
+      //新增链接
+      addLink: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/addLink',
+          data: JSON.stringify(self.linkData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('添加成功', {icon: 1, time: 1000});
+          self.linkData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      //修改链接
+      updateLink: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/updateLink',
+          data: JSON.stringify(self.linkData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('修改成功', {icon: 1, time: 1000});
+          self.linkData.showDialog = false;
+          self.$emit('page-event');
+        })
+      }
+    }
+  }
+</script>

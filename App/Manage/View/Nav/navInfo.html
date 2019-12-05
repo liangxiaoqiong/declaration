@@ -1,0 +1,152 @@
+<!--新增||编辑-导航栏-->
+<script type="x-template" id="nav_info">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>{{ titleName }}</h3><a @click="navData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar link-info ques-set-info">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>父级导航</label>
+              <el-select v-model="navData.dialogData.pid">
+                <el-option value="0" label="作为一级栏目"></el-option>
+                <el-option
+                    v-for="nav in navList"
+                    :disabled="+nav.nav_id === +navData.dialogData.nav_id"
+                    :value="nav.nav_id"
+                    :label="nav.nav_name"></el-option>
+              </el-select>
+            </div>
+            <div class="search-list-item">
+              <label>栏目名称</label>
+              <el-input placeholder="请输入栏目名称" v-model="navData.dialogData.nav_name"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>跳转链接</label>
+              <el-input placeholder="请输入跳转链接" v-model="navData.dialogData.url"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>排序</label>
+              <el-input v-model="navData.dialogData.sort"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>导航类型</label>
+              <el-radio-group v-model="navData.dialogData.nav_type">
+                <el-radio label="0">单文章类型</el-radio>
+                <el-radio label="1">文章列表类型</el-radio>
+                <el-radio label="2">会员类型</el-radio>
+                <el-radio label="3">专家团队</el-radio>
+              </el-radio-group>
+            </div>
+            <div class="search-list-item">
+              <label>是否显示</label>
+              <el-switch
+                  v-model="navData.dialogData.is_show"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>
+            <div class="search-list-item">
+              <label>是否推荐到首页</label>
+              <el-switch
+                  v-model="navData.dialogData.is_recommend"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>
+            <div class="search-list-item" v-if="+navData.dialogData.pid === 0">
+              <label style="vertical-align: top">广告图片</label>
+              <div>
+                <div class="upload-template" style="width: 757px;height: 90px;">
+                  <img :src="navData.dialogData.advertise_img" class="upload-img">
+                  <button class="upload-btn" @click="uploadClick">
+                    <span v-if="navData.dialogData.advertise_img === ''" class="font-12">请点击上传图片</span>
+                    <span v-else class="font-12">更换图片</span>
+                    <upload-file v-model="navData.dialogData.advertise_img" ref="upload_file" hidden></upload-file>
+                  </button>
+                </div>
+                <p class="color-grey font-12">建议尺寸：1514px * 180px</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitLink">提交</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.NAV_INFO = {
+    template: '#nav_info',
+    components:{
+      'upload-file': COMPONENT.UPLOAD_FILE_COMPONENT
+    },
+    props: {
+      navData: {}
+    },
+    data: function () {
+      return {
+        navList: []
+      }
+    },
+    computed: {
+      titleName: function () {
+        return this.navData.dialogType === 'edit' ? '编辑栏目' : '新增栏目'
+      }
+    },
+    methods: {
+      loadInit: function(){
+        var self = this;
+        self.getParentNavData().then(function (result) {
+          self.navList = result.data
+        })
+      },
+      //获取选项值
+      getParentNavData: function () {
+        return AppUtil.ajaxRequest({
+          url: APP + '/getParentNav',
+        })
+      },
+      //提交按钮
+      submitLink: function(){
+        var self = this;
+        self.navData.dialogType === 'edit' ? self.updateNav() : self.addNav()
+      },
+      //新增
+      addNav: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/navAdd',
+          data: JSON.stringify(self.navData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('添加成功', {icon: 1, time: 1000});
+          self.navData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      //修改
+      updateNav: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/navUpdate',
+          data: JSON.stringify(self.navData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('修改成功', {icon: 1, time: 1000});
+          self.navData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      uploadClick: function () {
+        this.$refs.upload_file.$el.click()
+      }
+    }
+  }
+</script>

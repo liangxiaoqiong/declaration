@@ -1,0 +1,89 @@
+<!--新增||编辑-链接-->
+<script type="x-template" id="member_title_info">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>{{ titleName }}</h3><a @click="memTitleData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar link-info ques-set-info">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>职务名称</label>
+              <el-input placeholder="请输入职务名称" v-model="memTitleData.dialogData.title_name"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>排序</label>
+              <el-input v-model="memTitleData.dialogData.sort"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>是否显示</label>
+              <el-switch
+                  v-model="memTitleData.dialogData.is_show"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitData">提交</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.MEMBER_TITLE_INFO = {
+    template: '#member_title_info',
+    components:{},
+    props: {
+      memTitleData: {}
+    },
+    data: function () {
+      return {}
+    },
+    computed: {
+      titleName: function () {
+        return this.memTitleData.dialogType === 'edit' ? '编辑会员职务' : '新增会员职务'
+      }
+    },
+    methods: {
+      //提交按钮
+      submitData: function(){
+        var self = this;
+        if(self.memTitleData.dialogData.title_name === ''){
+          layer.msg('请输入职务名称', {icon: 2, anim: 6, time: 1000});
+          return false;
+        }
+        self.memTitleData.dialogType === 'edit' ? self.updateMemberTitle() : self.addMemberTitle()
+      },
+      //新增
+      addMemberTitle: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/addMemberTitle',
+          data: JSON.stringify(self.memTitleData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('添加成功', {icon: 1, time: 1000});
+          self.memTitleData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      //修改
+      updateMemberTitle: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/updateMemberTitle',
+          data: JSON.stringify(self.memTitleData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('修改成功', {icon: 1, time: 1000});
+          self.memTitleData.showDialog = false;
+          self.$emit('page-event');
+        })
+      }
+    }
+  }
+</script>

@@ -1,0 +1,25 @@
+<!--友情链接-->
+<script type="x-template" id="com_foot_components">
+  <div class="com-foot">
+    <div class="container">
+      <div class="foot-links">
+        <a v-for="(link, index) in links" :index="index" target="_blank" :href="link.link_url">{{ link.link_name }}</a>
+      </div>
+      <div class="foot-warp">
+        <div>{:get_cfg_value('CFG_POWERBY')}　<a href="javascript:;" target="_blank">{:get_cfg_value('CFG_BEIAN')}</a></div>
+        <div>电话：{:get_cfg_value('CFG_PHONE')}　|　传真：{:get_cfg_value('CFG_FAX')}　|　地址：{:get_cfg_value('CFG_ADDRESS')}，邮编：{:get_cfg_value('CFG_ZIP_CODE')}</div>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.COM_FOOT_COMPONENTS = {
+    template: '#com_foot_components',
+    props: {
+      links: Array
+    },
+    data: function () {
+      return {}
+    },
+  }
+</script>

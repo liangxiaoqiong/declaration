@@ -1,0 +1,24 @@
+<!--我的问卷列表-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="questionnaire-list">
+      <template v-if="+tableData.total > 0">
+       <a v-for="data in tableData.list" @click="quesAction(data)"><span>{{data.qnr_name}}</span><font class="fr">{{data.create_time | formatDate}}</font></a>
+      </template>
+      <template v-else>
+        <a class="table-null">暂无问卷数据</a>
+      </template>
+    </div>
+    <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}"
+                @page-event="getTableData"></pagination>
+
+    <template v-if="temp.quesDialog.showDialog">
+      <questionnaire-info ref="myqnrLayer" :prop-data="temp.quesDialog"></questionnaire-info>
+    </template>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Company/myQnrInfo"/>
+  <script type="text/javascript" src="__ADMIN__/js/Company/myQnr.js?v={$V}"></script>
+</block>

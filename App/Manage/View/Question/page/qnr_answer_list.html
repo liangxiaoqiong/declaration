@@ -1,0 +1,136 @@
+<script type="x-template" id="qnr_answer_list">
+  <div class="dialog-default">
+    <div class="dialog-body" style="width: 90%;">
+      <div class="dialog-head"><h3>【{{qnrAnswerData.dialogData.qnr_name}}】答卷列表</h3><a @click="qnrAnswerData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar ques-set-info">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>时间搜索</label>
+              <datetime-range v-model="query.search_time" :time_range="query.search_time"></datetime-range>
+            </div>
+            <div class="search-list-item">
+              <label>公司名称</label>
+              <el-input v-model="query.company_name" placeholder="请输入公司名称"></el-input>
+            </div>
+          </div>
+          <div class="search-btn">
+            <button type="button" class="btn-default" @click="getTableData({page: 1, limit: query.limit})">搜索</button>
+          </div>
+        </div>
+
+        <div>
+          <table class="layui-table">
+            <thead>
+            <tr>
+              <th>公司名称</th>
+              <th>提交时间</th>
+              <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr v-for="data in tableData.list">
+                <td>{{data.company_name}}</td>
+                <td>{{data.save_time | formatDate}}</td>
+                <td>
+                  <a class="layui-btn layui-btn-primary layui-btn-xs" @click="showAnswerInfo(data)">查看</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="qnrAnswerData.showDialog = false">关闭</a>
+      </div>
+    </div>
+    <template v-if="temp.qnrAnsInfoDialog.showDialog">
+      <qnr-answer-info ref="qnrAnsInfoLayer" :answer-data="temp.qnrAnsInfoDialog"></qnr-answer-info>
+    </template>
+  </div>
+</script>
+<include file="Question/page/qnr_answer_info"/>
+<script>
+  COMPONENT.QNR_ANSWER_LIST = {
+    template: '#qnr_answer_list',
+    components: {
+      'pagination': COMPONENT.PAGINATION,
+      'datetime-range': COMPONENT.DATETIME_RANGE,
+      'qnr-answer-info': COMPONENT.QNR_ANSWER_INFO
+    },
+    props: {
+      qnrAnswerData: Object
+    },
+    data: function () {
+      return {
+        query: {
+          page: 1,
+          limit: 20,
+          company_name: '',
+          qnr_id: this.qnrAnswerData.dialogData.qnr_id,
+          min_create_time: '',
+          max_create_time: '',
+          search_time: ''
+        },
+        temp: {
+          qnrAnsInfoDialog: {
+            showDialog: false,
+            dialogData: {}
+          }
+        },
+        tableData: {}
+      }
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.formatDate(new Date(value * 1000));
+      }
+    },
+    watch: {
+      'query.search_time': function (val) {
+        var self = this;
+        if (val !== '') {
+          self.query.min_create_time = val[0];
+          self.query.max_create_time = val[1];
+        } else {
+          self.query.min_create_time = '';
+          self.query.max_create_time = '';
+        }
+      }
+    },
+    methods: {
+      loadInit: function () {
+        this.getTableData({page: 1, limit: 20});
+      },
+      getTableData: function (current) {
+        var self = this;
+        if(typeof current !== 'undefined'){
+          if(typeof current.page !== 'undefined'){
+            self.query.page = current.page;
+          }
+          if(typeof current.limit !== 'undefined'){
+            self.query.limit = current.limit;
+          }
+        }
+        AppUtil.ajaxRequest({
+          url: APP + '/getQnrAnswerList',
+          data: self.query,
+        }).then(function (result) {
+          self.tableData = result.data;
+          self.loadComplete = true;
+        })
+      },
+      //查看答卷详情
+      showAnswerInfo: function (item) {
+        var self = this;
+        self.temp.qnrAnsInfoDialog.dialogData = item;
+        self.temp.qnrAnsInfoDialog.showDialog = true;
+        self.$nextTick(function () {
+          self.$refs.qnrAnsInfoLayer.loadInit();
+        })
+      }
+    }
+  }
+</script>

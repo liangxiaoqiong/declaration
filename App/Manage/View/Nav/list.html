@@ -1,0 +1,208 @@
+<!--管理员：文章管理/官网导航-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="table-search" style="text-align: right">
+      <div class="search-btn-other" style="position: initial;">
+        <a class="btn-green" @click="showNavInfoLayer('add')">+ 添加栏目</a>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th>栏目名称</th>
+          <th>导航类型</th>
+          <th>排序</th>
+          <th>推荐</th>
+          <th>显示</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-if="+tableData.list.length > 0">
+          <template v-for="data in tableData.list">
+            <tr>
+              <td style="padding-left:20px;text-align: left;">{{ data.nav_name }}</td>
+              <td>{{ navTypeName(data.nav_type) }}</td>
+              <td>
+                <input type="text" v-model="data.sort" class="myui-input" style="width: 50px;text-align: center"
+                       @blur="editNavData(data)" @keyup="sortVerify(data)">
+              </td>
+              <td>
+                <el-switch @change="editNavData(data)"
+                           v-model="data.is_recommend"
+                           active-value="1"
+                           inactive-value="0"
+                           active-color="#13ce66"
+                           inactive-color="#ff4949">
+                </el-switch>
+              </td>
+              <td>
+                <el-switch @change="editNavData(data)"
+                           v-model="data.is_show"
+                           active-value="1"
+                           inactive-value="0"
+                           active-color="#13ce66"
+                           inactive-color="#ff4949">
+                </el-switch>
+              </td>
+              <td>
+                <a class="layui-btn layui-btn-normal layui-btn-xs" @click="showNavInfoLayer('edit', data)">修改</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" @click="delNav(data)">删除</a>
+              </td>
+            </tr>
+            <!--子栏目-->
+            <template v-for="child in data.child">
+              <tr>
+                <td style="padding-left: 40px;text-align: left">——{{ child.nav_name }}</td>
+                <td>{{ navTypeName(child.nav_type) }}</td>
+                <td>
+                  <input type="text" v-model="child.sort" class="myui-input" style="width: 50px;text-align: center"
+                         @blur="editNavData(child)" @keyup="sortVerify(child)">
+                </td>
+                <td>
+                  <el-switch @change="editNavData(child)"
+                             v-model="child.is_recommend"
+                             active-value="1"
+                             inactive-value="0"
+                             active-color="#13ce66"
+                             inactive-color="#ff4949">
+                  </el-switch>
+                </td>
+                <td>
+                  <el-switch @change="editNavData(child)"
+                             v-model="child.is_show"
+                             active-value="1"
+                             inactive-value="0"
+                             active-color="#13ce66"
+                             inactive-color="#ff4949">
+                  </el-switch>
+                </td>
+                <td>
+                  <a class="layui-btn layui-btn-normal layui-btn-xs" @click="showNavInfoLayer('edit', child)">修改</a>
+                  <a class="layui-btn layui-btn-danger layui-btn-xs" @click="delNav(child)">删除</a>
+                </td>
+              </tr>
+            </template>
+          </template>
+        </template>
+        <template v-else>
+          <tr><td colspan="6" class="table-null">暂无数据</td></tr>
+        </template>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-show="temp.navDialog.showDialog">
+      <nav-info ref="navInfoLayer" :nav-data="temp.navDialog" @page-event="getTableData"></nav-info>
+    </div>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Nav/navInfo"/>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      components: {
+        'nav-info': COMPONENT.NAV_INFO,
+      },
+      data: function () {
+        return {
+          loadComplete: false,
+          temp: {
+            navDialog: {
+              showDialog: false,
+              dialogData: {},
+              dialogType: ''
+            },
+            editData: {}
+          },
+          tableData: {list: []}
+        }
+      },
+      computed: {
+        navTypeName: function(){
+          return function (val) {
+            // 0-单文章类型 1-文章列表类型 2-会员类型
+            return +val === 0 ? '单文章类型' :  +val === 1 ? '文章列表类型' : '会员类型'
+          }
+        }
+      },
+      mounted: function () {
+        this.getTableData();
+      },
+      methods: {
+        getTableData: function () {
+          var self = this;
+          AppUtil.ajaxRequest({
+            url: APP + '/getNavData',
+            contentType: AppUtil.CONTENT_TYPE_JSON,
+          }).then(function (result) {
+            self.tableData.list = result.data;
+            self.loadComplete = true;
+          })
+        },
+        //添加||修改弹框
+        showNavInfoLayer: function (type, item) {
+          var self = this;
+          if(type === 'add'){
+            item = {
+              "pid": "0",
+              "nav_name": "",
+              "nav_type": "0",
+              "url": "",
+              "is_recommend": "1",
+              "sort": "1",
+              "advertise_img": "",
+              "is_show": "1"
+            }
+          }
+          var data = JSON.stringify(item);
+          self.temp.navDialog.dialogData = JSON.parse(data);
+          self.temp.navDialog.dialogType = type;
+          self.temp.navDialog.showDialog = true;
+          self.$nextTick(function () {
+            self.$refs.navInfoLayer.loadInit()
+          })
+        },
+        //删除
+        delNav: function (item) {
+          var self = this;
+          layer.confirm('', {title: '确定删除该栏目？', skin: 'layer-confirm'}, function (index) {
+            AppUtil.ajaxRequest({
+              url: APP + '/navDelete',
+              data: {nav_id: item.nav_id},
+            }).then(function (result) {
+              self.getTableData();
+              layer.msg('删除成功！', {icon: 1, time: 1000});
+              layer.close(index);
+            }).catch(function () {
+              self.getTableData();
+            })
+          })
+        },
+        //推荐、显示、排序的修改
+        editNavData: function (item) {
+          var self = this;
+          console.log(item);
+          AppUtil.ajaxRequest({
+            url: APP + '/navUpdate',
+            data: JSON.stringify(item),
+            contentType: AppUtil.CONTENT_TYPE_JSON,
+          }).then(function (result) {
+            layer.msg('修改成功', {icon: 1, time: 1000});
+            self.getTableData();
+          })
+        },
+        sortVerify: function(item){
+          if (item.sort.length == 1) {
+            item.sort = item.sort.replace(/[^0-9]/g, '')
+          } else {
+            item.sort = item.sort.replace(/\D/g, '')
+          }
+        },
+      }
+    })
+  </script>
+</block>

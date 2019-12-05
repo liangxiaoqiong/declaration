@@ -1,0 +1,201 @@
+<extend name="Public:base" />
+<block name="header_js">
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<!--<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe642;</i> 
+                在线客服设置  
+                </h3>
+            </div>
+            
+        </div>-->
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('online')}">
+        	<div>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">显示状态</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称标识</label>
+                    <div class="layui-input-block">
+                    	<input type="radio" name="config[ONLINE_CFG_MODE]" value="1" <if condition="$vo['ONLINE_CFG_MODE'] eq 1">checked="checked"</if> title="显示" />
+                        <input type="radio" name="config[ONLINE_CFG_MODE]" value="0" <if condition="$vo['ONLINE_CFG_MODE'] eq 0">checked="checked"</if> title="隐藏" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">样式</label>
+                    <div class="layui-input-inline">
+                        <select name="config[ONLINE_CFG_STYLE]" class="form-control">
+                            <foreach name='onlineStyleList' item='v'>
+                            <option value="{$v}" <if condition="$vo['ONLINE_CFG_STYLE'] eq $v">selected="selected"</if>>{$v}</option>
+                            </foreach>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">显示位置设置</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">水平位置</label>
+                    <div class="layui-input-block">
+                        <div class="layui-input-inline" style="width:40%;">
+                            <input type="radio" name="config[ONLINE_CFG_H]" value="0" <if condition="$vo['ONLINE_CFG_H'] eq 0">checked="checked"</if> title="左对齐" />
+                            <input type="radio" name="config[ONLINE_CFG_H]" value="1" <if condition="$vo['ONLINE_CFG_H'] eq 1">checked="checked"</if> title="右对齐" />
+                            <input type="radio" name="config[ONLINE_CFG_H]" value="2" <if condition="$vo['ONLINE_CFG_H'] eq 2">checked="checked"</if> title="水平居中" />
+                        </div>
+                        <div class="layui-input-inline txt-inline" style="width:90px;">与边界的距离</div>
+                        <div class="layui-input-inline">
+                            <input type="text" name="config[ONLINE_CFG_H_MARGIN]" class="layui-input" value="{$vo.ONLINE_CFG_H_MARGIN}" />
+                        </div>
+                        <div class="layui-input-inline txt-inline">像素</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">垂直位置</label>
+                    <div class="layui-input-block">
+                        <div class="layui-input-inline" style="width:40%;">
+                            <input type="radio" name="config[ONLINE_CFG_V]" value="0" <if condition="$vo['ONLINE_CFG_V'] eq 0">checked="checked"</if> title="顶部对齐" />
+                            <input type="radio" name="config[ONLINE_CFG_V]" value="1" <if condition="$vo['ONLINE_CFG_V'] eq 1">checked="checked"</if> title="底部对齐" />
+                            <input type="radio" name="config[ONLINE_CFG_V]" value="2" <if condition="$vo['ONLINE_CFG_V'] eq 2">checked="checked"</if> title="垂直居中" />
+                        </div>
+                        <div class="layui-input-inline txt-inline" style="width:90px;">与边界的距离</div>
+                        <div class="layui-input-inline">
+                            <input type="text" name="config[ONLINE_CFG_V_MARGIN]" class="layui-input" value="{$vo.ONLINE_CFG_V_MARGIN}" />
+                        </div>
+                        <div class="layui-input-inline txt-inline">像素</div>
+                    </div>
+                </div>
+                
+            </div>
+            
+             <div>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">客服号码设置（一行一个QQ号(包括说明,分隔符为$$$),如 1172096750$$$点击咨询）</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">QQ</label>
+                    <div class="layui-input-inline" style="width:60%;">
+                        <textarea name="config[ONLINE_CFG_QQ]" class="layui-textarea">{$vo.ONLINE_CFG_QQ}</textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">旺旺</label>
+                    <div class="layui-input-inline" style="width:60%;">
+                        <textarea name="config[ONLINE_CFG_WANGWANG]" class="layui-textarea">{$vo.ONLINE_CFG_WANGWANG}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+             <div>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">电话设置</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">显示电话</label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="config[ONLINE_CFG_PHONE_ON]" value="1" <if condition="$vo['ONLINE_CFG_PHONE_ON'] eq 1">checked="checked"</if> title="显示" />
+                        <input type="radio" name="config[ONLINE_CFG_PHONE_ON]" value="0" <if condition="$vo['ONLINE_CFG_PHONE_ON'] eq 0">checked="checked"</if> title="隐藏" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">电话号码</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="config[ONLINE_CFG_PHONE]"  class="layui-input" value="{$vo.ONLINE_CFG_PHONE}" />
+                    </div>
+                </div>
+            </div>
+            
+             <div>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">留言设置</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">显示留言</label>
+                    <div class="layui-input-inline">
+                        <input type="radio" name="config[ONLINE_CFG_GUESTBOOK_ON]" value="1" <if condition="$vo['ONLINE_CFG_GUESTBOOK_ON'] eq 1">checked="checked"</if> title="显示" />
+                        <input type="radio" name="config[ONLINE_CFG_GUESTBOOK_ON]" value="0" <if condition="$vo['ONLINE_CFG_GUESTBOOK_ON'] eq 0">checked="checked"</if> title="隐藏" />
+                    </div>
+                </div>
+            </div>
+            
+             <div>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">参数设置(不熟悉的，请不要动)</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">QQ参数</label>
+                    <div class="layui-input-inline" style="width:60%;">
+                        <textarea name="config[ONLINE_CFG_QQ_PARAM]" class="layui-textarea">{$vo.ONLINE_CFG_QQ_PARAM}</textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">旺旺参数</label>
+                    <div class="layui-input-inline" style="width:60%;">
+                        <textarea name="config[ONLINE_CFG_WANGWANG_PARAM]" class="layui-textarea">{$vo.ONLINE_CFG_WANGWANG_PARAM}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                	<input type="hidden" name="id" value="{$vo.id}" />
+                    <div class="formbtngroup">
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>保存 </button>
+                    </div>
+                 </div>
+             </div>
+         </form>
+    </div>
+    <script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  //显示or隐藏URL模式
+	  form.on('radio(urlmodel)', function(data){
+		var val = data.value;
+		if (val == 1 || val ==2 ) {
+			jq('#UrlRouter1').show();
+		}else {
+			jq('#UrlRouter1').hide();
+
+		}
+	  });
+	  
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	</script>
+</block>

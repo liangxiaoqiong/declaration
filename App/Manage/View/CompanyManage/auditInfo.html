@@ -1,0 +1,230 @@
+<!--管理员：企业认证/审核详情-->
+<script type="x-template" id="companymanage_audit_info">
+  <div class="dialog-default">
+    <div class="dialog-body audit-info">
+      <div class="dialog-head"><h3>{{auditData.dialogData.company_name}}</h3><a
+          @click="auditData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar declare-info">
+        <i :class="'audit-status__'+companyData.audit_status"></i>
+        <div class="data-info" v-if="temp.loadComplete">
+          <!--region 企业基本信息-->
+          <dl>
+            <dt>企业基本信息</dt>
+            <dd>
+              <div>
+                <label><span>公司名称：</span><font>{{ companyData.company_name }}</font></label>
+                <label><span>公司性质：</span><font>{{getCompanySelectName('company_form')}}</font></label>
+              </div>
+              <div>
+                <label><span>所属地区：</span><font>{{ temp.companyArea }}</font></label>
+                <label><span>是否高新企业：</span><font>{{ +companyData.is_high_new === 1 ? '是' : '否' }}</font></label>
+              </div>
+              <div>
+                <label><span>所有制形式：</span><font>{{getCompanySelectName('capital_form')}}</font></label>
+                <label><span>企业法人代码：</span><font>{{ companyData.license_no }}</font></label>
+              </div>
+              <div>
+                <label><span>注册地址：</span><font>{{ companyData.address }}</font></label>
+                <label><span>注册资本(万元)：</span><font>{{ companyData.capital }}</font></label>
+              </div>
+              <div>
+                <label><span>成立时间：</span><font>{{ +companyData.establishment_time | formatDate }}</font></label>
+                <label><span>法人代表：</span><font>{{ companyData.legal_person }}</font></label>
+              </div>
+              <div>
+                <label><span>法人手机：</span><font>{{ companyData.lp_mobile }}</font></label>
+                <label><span>企业电话：</span><font>{{ companyData.tel }}</font></label>
+              </div>
+              <div>
+                <label><span>企业邮箱：</span><font>{{ companyData.email }}</font></label>
+              </div>
+              <div>
+                <label><span>公司简介：</span><font>{{ companyData.introduction }}</font></label>
+                <label><span>企业营业执照：</span><font><img :src="companyData.license_image"></font></label>
+              </div>
+              <div>
+                <label><span>应用领域：</span><font>{{getCompanySelectName('apply_fields')}}</font></label>
+                <label><span>经营范围：</span><font>{{ companyData.scope }}</font></label>
+              </div>
+            </dd>
+          </dl>
+          <!--endregion 企业基本信息-->
+
+          <!--region 联系人信息-->
+          <dl>
+            <dt>联系人信息</dt>
+            <dd>
+              <div>
+                <label><span>姓名：</span><font>{{ companyData.contact_name }}</font></label>
+                <label><span>职务：</span><font>{{ companyData.contact_duty }}</font></label>
+              </div>
+              <div>
+                <label><span>手机：</span><font>{{ companyData.contact_mobile }}</font></label>
+                <label><span>电话：</span><font>{{ companyData.contact_tel }}</font></label>
+              </div>
+              <div>
+                <label><span>传真：</span><font>{{ companyData.contact_fax }}</font></label>
+                <label><span>邮箱：</span><font>{{ companyData.contact_email }}</font></label>
+              </div>
+              <div>
+                <label><span>QQ：</span><font>{{ companyData.contact_qq }}</font></label>
+                <label><span>微信：</span><font>{{ companyData.contact_wechat }}</font></label>
+              </div>
+              <div v-if="+companyData.audit_status === 2">
+                <label><span>拒绝原因：</span><font>{{ companyData.audit_reason }}</font></label>
+              </div>
+            </dd>
+          </dl>
+          <!--endregion 联系人信息-->
+        </div>
+      </div>
+      <div class="dialog-foot" v-if="temp.loadComplete">
+        <template v-if="+companyData.audit_status === 0">
+          <a @click="auditPass">通过</a>
+          <a @click="auditRefuse" class="btn-red">拒绝</a>
+        </template>
+        <template v-else>
+          <a @click="auditData.showDialog = false">确定</a>
+        </template>
+      </div>
+    </div>
+    <div>
+      <select id="province" disabled lay-ignore></select>
+      <select id="area" disabled lay-ignore></select>
+      <select id="city" disabled lay-ignore></select>
+    </div>
+  </div>
+</script>
+<script src="__CITY_JS__"></script>
+<script>
+  COMPONENT.COMPANYMANAGE_AUDIT_INFO = {
+    template: '#companymanage_audit_info',
+    components: {},
+    props: {
+      auditData: Object
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.formatDate(new Date(value * 1000));
+      }
+    },
+    data: function () {
+      return {
+        temp: {
+          companyArea: '',
+          loadComplete: false,
+        },
+        companyQuery: {},
+        companyData: {},
+      }
+    },
+    computed: {
+      //获取select id对应的text
+      getCompanySelectName: function () {
+        var self = this;
+        return function (selectType) {
+          var result = '';
+          var j = 0
+          if (self.companyQuery[selectType] && self.companyData[selectType]) {
+            self.companyQuery[selectType].forEach(function (value) {
+              if (selectType === 'apply_fields') {
+                var arr = self.companyData[selectType].split(',');
+                for (var i = 0; i < arr.length; i++) {
+                  if (+arr[i] === +value.id) {
+                    if(j > 0){
+                      result += ','
+                    }
+                    result += value.item_name;
+                    j++
+                  }
+                }
+              } else {
+                if (+value.id === +self.companyData[selectType]) {
+                  result = value.item_name
+                }
+              }
+            })
+          }
+          return result;
+        }
+      }
+    },
+    methods: {
+      loadInit: function () {
+        var self = this;
+        var loading = layer.load(2, {shade: [0.2, '#000']});
+        self.getCompanySelect().then(function (result) {
+          self.companyQuery = result.data;
+          self.getCompanyDetail().then(function (result) {
+            self.companyData = result.data;
+            self.$nextTick(function () {
+              setcity('province', 'city', 'area', self.companyData.area_id_1, self.companyData.area_id_2, self.companyData.area_id_3);
+              var province = $('#province').find("option:selected").text();
+              var city = $('#city').find("option:selected").text();
+              var area = $('#area').find("option:selected").text();
+              self.temp.companyArea = province + '' + city + '' + area;
+              self.temp.loadComplete = true;
+              layer.close(loading);
+            })
+          })
+        })
+      },
+      //获取select
+      getCompanySelect: function () {
+        return AppUtil.ajaxRequest({
+          url: APP + '/getSelectData',
+        })
+      },
+      //获取某个企业的详细数据
+      getCompanyDetail: function () {
+        var self = this;
+        return AppUtil.ajaxRequest({
+          url: APP + '/getCompanyDetail',
+          data: {company_id: self.auditData.dialogData.company_id},
+        })
+      },
+      //审核通过
+      auditPass: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/passCompanyApply',
+          data: {company_id: self.companyData.company_id},
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          self.$nextTick(function () {
+            self.companyData.audit_status = 1;
+            self.$emit('page-event');
+            layer.msg('已审核通过', {icon: 1, time: 1000});
+          })
+        })
+      },
+      //审核拒绝
+      auditRefuse: function () {
+        var self = this;
+        layer.prompt({
+          formType: 2,
+          value: '',
+          title: '请输入拒绝原因',
+          area: ['400px', '200px']
+        }, function (value, index, elem) {
+          AppUtil.ajaxRequest({
+            url: APP + '/refuseCompanyApply',
+            data: {company_id: self.companyData.company_id, audit_reason: value},
+            contentType: AppUtil.CONTENT_TYPE_JSON,
+          }).then(function (result) {
+            self.companyData.audit_status = 2;
+            self.companyData.audit_reason = value;
+            self.$nextTick(function () {
+              self.$emit('page-event');
+              layer.msg('审核已拒绝', {icon: 1, time: 1000});
+              layer.close(index);
+            })
+          }).catch(function (result) {
+            
+          })
+        });
+      }
+    }
+  }
+</script>

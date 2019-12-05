@@ -1,0 +1,15 @@
+<include file="Test/vue/src/pages/form"/>
+<script>
+  var ROUTER = new VueRouter({
+    routes: [
+      {
+        path: '/',
+        redirect: '/form'
+      },
+      {
+        path: '/form',
+        component: FORM_PAGE
+      }
+    ]
+  })
+</script>

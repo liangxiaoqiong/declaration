@@ -1,0 +1,84 @@
+<!--管理员：问卷调查设置列表-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="table-search">
+      <div class="search-list">
+        <div class="search-list-item">
+          <label>时间搜索</label>
+          <datetime-range v-model="query.search_time" :time_range="query.search_time"></datetime-range>
+        </div>
+        <div class="search-list-item">
+          <label>问卷名称</label>
+          <el-input v-model="query.qnr_name" placeholder="请输入问卷名称"></el-input>
+        </div>
+      </div>
+      <div class="search-btn">
+        <button type="button" class="btn-default" @click="getTableData({page: 1, limit: query.limit})">搜索</button>
+        <button type="button" class="btn-default" @click="resetSearch">清空</button>
+      </div>
+      <div class="search-btn-other">
+        <a class="btn-green" style="width: 127px;" @click="quesSetAction('add', {})">+ 添加新的问卷</a>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th>问卷名称</th>
+          <th>创建时间</th>
+          <th>已交问卷</th>
+          <th>操作</th>
+          <th>是否开启</th>
+          <th>是否强制填写</th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-if="+tableData.total > 0">
+          <tr v-for="data in tableData.list">
+            <td>{{data.qnr_name}}</td>
+            <td>{{data.create_time | formatDate}}</td>
+            <td><a class="color-blue" @click="showQnrAnswer(data)">{{data.num}}</a></td>
+            <td>
+              <a class="layui-btn layui-btn-primary layui-btn-xs" @click="quesSetAction('edit', data)">查看</a>
+            </td>
+            <td>
+              <el-switch @change="changeOpen(data)"
+                  v-model="data.is_open"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </td>
+            <td>
+              <el-switch @change="changeForce(data)"
+                  v-model="data.is_force"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </td>
+          </tr>
+        </template>
+        <template v-else>
+          <tr><td colspan="5" class="table-null">暂无问卷数据</td></tr>
+        </template>
+        </tbody>
+      </table>
+      <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+    </div>
+    <template v-if="temp.quesSetDialog.showDialog">
+      <qnr-set-info ref="qnrLayer" :ques-set-data="temp.quesSetDialog"></qnr-set-info>
+    </template>
+    <template v-if="temp.qnrAnswerData.showDialog">
+      <qnr-answer-list ref="qnrAnswerLayer" :qnr-answer-data="temp.qnrAnswerData"></qnr-answer-list>
+    </template>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Question/qnrInfo"/>
+  <include file="Question/page/qnr_answer_list"/>
+  <script type="text/javascript" src="__ADMIN__/js/Question/qnrList.js?v={$V}"></script>
+</block>

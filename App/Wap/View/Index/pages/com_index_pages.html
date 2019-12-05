@@ -1,0 +1,254 @@
+<script type="x-template" id="com_index_pages">
+  <div class="com-index">
+    <!--region swiper轮播图 -->
+    <div class="com-swiper" :class="{'swiper-default': adList.length === 0}">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide" v-for="ad in adList">
+            <template v-if="ad.ad_url !== ''"><a :href="ad.ad_url"><img :src="ad.ad_img"></a></template>
+            <template v-else><a><img :src="ad.ad_img"></a></template>
+          </div>
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button">
+          <div class="swiper-button-container">
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--endregion swiper轮播图-->
+    <div class="com-news">
+      <div class="container">
+        <!--region 中间左侧文章新闻-->
+        <div class="news-left">
+          <div class="left-list" v-for="(pNav, pIndex) in navAndArt" :index="pIndex">
+            <div class="list-head">
+              <h3>{{ pNav.nav_name }}</h3>
+              <div class="nav-child">
+                <a v-for="(nav, nIndex) in pNav.child" :index="nIndex" :class="{'active': navAndArtTadActive(pIndex, nIndex)}"
+                   @click="changeTitle(pIndex, nIndex)">
+                  {{ nav.nav_name }}
+                </a>
+              </div>
+              <a class="nav-more" @click="navMoreLink(pNav)"><font>更多</font></a>
+            </div>
+            <div class="list-news" v-for="(nav, nIndex) in pNav.child" :index="nIndex" v-if="navAndArtTadActive(pIndex, nIndex)">
+              <template v-if="nav.articles.length > 0">
+                <template v-for="(art, aIndex) in nav.articles">
+                  <a class="news" :index="aIndex" @click="artLink(art)" v-if="art.article_img === ''">
+                    <span>{{ art.article_title }}</span>
+                    <font>[{{ art.create_time | formatDate }}]</font>
+                  </a>
+                  <a class="news-info-img" :index="aIndex" @click="artLink(art)" v-else>
+                    <img :src="art.article_img">
+                    <div class="art-text">
+                      <h4 class="line-one">{{ art.article_title }}</h4>
+                      <p class="line-three">{{ art.article_desc }}</p>
+                    </div>
+                  </a>
+                </template>
+              </template>
+              <template v-else>
+                <div class="no-data"></div>
+              </template>
+            </div>
+            <div class="nav-img" v-if="pNav.advertise_img !== ''">
+              <img :src="pNav.advertise_img">
+            </div>
+          </div>
+        </div>
+        <!--endregion 中间左侧文章新闻-->
+        <div class="news-right">
+          <!--region 专家团队-->
+          <div class="right-list">
+            <h3 @click="expertListLink">专家团队</h3>
+            <div class="list-chara">
+              <a v-for="(exp, index) in expert" :index="index" @click="expertListLink">
+                <img :src="exp.expert_logo">
+                <div class="list-text">
+                  <div class="chara-name">
+                    <b>{{ exp.expert_name }}</b>
+                    <font>{{ exp.expert_titel }}</font>
+                  </div>
+                  <div class="chara-desc line-two">{{ exp.expert_desc }}</div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <!--endregion 专家团队-->
+          <!--region 会员风采-->
+          <div class="right-list">
+            <h3 @click="memberListLink">会员风采</h3>
+            <div class="list-user-div">
+              <ul class="list-news" id="list-user">
+                <li v-for="(member, index) in member" :index="index" class="news">
+                  <div onclick="getMember(this)" :data-id="member.member_id">
+                    <span>{{ member.member_name }}</span>
+                    <font>[{{ member.title_name }}]</font>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!--endregion 会员风采-->
+          <!--region 推荐企业-->
+          <div class="right-list" style="padding-bottom: 20px;">
+            <h3 @click="memberListLink">推荐企业</h3>
+            <div class="list-company" id="list-company">
+              <table cellpadding="0" cellspacing="0">
+                <template v-for="list in member_company">
+                  <tr>
+                    <template v-for="(member, index) in list">
+                      <td>
+                        <div class="company-div" :index="index" onclick="getMember(this)" :data-id="member.member_id">
+                          <div class="member-logo"><div><img :src="member.logo"></div></div>
+                          <p>{{ member.short_name }}</p>
+                        </div>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </table>
+            </div>
+          </div>
+          <!--endregion 推荐企业-->
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.COM_INDEX_PAGES = {
+    template: '#com_index_pages',
+    props: {
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.dateTime_Str(new Date(value * 1000), 'date');
+      }
+    },
+    watch: {
+      '$parent.loadComplete': function () {
+        this.navArr = this.$parent.topNavData.navArr
+        this.adList = this.$parent.adList
+        this.navAndArt = this.$parent.navAndArt
+        this.expert = this.$parent.expert
+        this.member = this.$parent.member
+        this.member_company = this.$parent.member_company
+        this.navAndArtTad = this.$parent.temp.navAndArtTad
+      },
+    },
+    data: function () {
+      return {
+        navArr: this.$parent.topNavData.navArr,
+        adList: this.$parent.adList,
+        navAndArt: this.$parent.navAndArt,
+        expert: this.$parent.expert,
+        member: this.$parent.member,
+        member_company: this.$parent.member_company,
+        navAndArtTad: this.$parent.temp.navAndArtTad
+      }
+    },
+    computed: {
+      navAndArtTadActive: function () {
+        return function (pIndex, nIndex) {
+          return +this.navAndArtTad[pIndex] === +nIndex
+        }
+      }
+    },
+    methods: {
+      changeTitle: function (pIndex, nIndex) {
+        this.$set(this.navAndArtTad, pIndex, nIndex)
+      },
+      //更多跳转
+      navMoreLink: function (item) {
+        var self = this
+        if(typeof item.url !== 'undefined' && item.url !== ''){
+          window.open(item.url)
+        }else {
+          var nid = item.nav_id
+          var nav_type = self.navArr[item.nav_id].nav_type
+          if ((typeof item.child !== 'undefined') && item.child.length > 0) {
+            //默认第一个子级
+            nid = item.child[0].nav_id
+            nav_type = self.navArr[item.child[0].nav_id].nav_type
+          }
+          switch (+nav_type) {
+            case 0:
+              router.push({ path: 'art-info', query: { nid: nid}})
+              break;
+            case 1:
+              router.push({ path: 'art-list', query: { nid: nid, p: 1}})
+              break;
+            case 2:
+              router.push({ path: 'member-list', query: { nid: nid}})
+              break;
+            case 3:
+              router.push({ path: 'expert', query: { nid: nid}})
+              break;
+            default:
+              break;
+          }
+        }
+      },
+      //阅读文章增加点击量/index.php?s=/clickArt
+      clickArt: function (article_id) {
+        var self = this
+        AppUtil.ajaxRequest({
+          url: APP + '/clickArt',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: {article_id: article_id},
+          type: 'get',
+          isLoad: false,
+        }).then(function () {
+          router.push({ path: 'art-info', query: { aid: article_id}})
+        })
+      },
+      //单条文章跳转
+      artLink: function (item) {
+        var self = this
+        AppUtil.ajaxRequest({
+          url: APP + '/getArt',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: {article_id: item.article_id},
+          type: 'get',
+          isLoad: false,
+        }).then(function (result) {
+          if(typeof result.data.article_id !== 'undefined' && typeof result.data.nav_id !== 'undefined'){
+            self.clickArt(item.article_id)
+          }
+        })
+      },
+      //专家团队跳转
+      expertListLink: function(){
+        router.push({ path: 'expert', query: { nid: this.$parent.topNavData.navType3[0].nav_id}})
+      },
+      //推荐企业，会员会员跳转
+      memberListLink: function () {
+        router.push({ path: 'member-list', query: { nid: this.$parent.topNavData.navType2[1].nav_id}})
+      },
+      //单条会员跳转
+      memberLink: function (item) {
+        var self = this
+        AppUtil.ajaxRequest({
+          url: APP + '/getMember',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: {member_id: item.member_id},
+          type: 'get',
+          isLoad: false,
+        }).then(function (result) {
+          if(typeof result.data.member_id !== 'undefined'){
+            router.push({ path: 'member-info', query: { mid: item.member_id}})
+          }
+        })
+      }
+    },
+  }
+  function getMember (obj) {
+    var mid = $(obj).data('id')
+    COMPONENT.COM_INDEX_PAGES.methods.memberLink({member_id: mid})
+  }
+</script>

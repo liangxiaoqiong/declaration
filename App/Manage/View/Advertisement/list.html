@@ -1,0 +1,113 @@
+<!--管理员：文章管理/广告轮播-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="table-search" style="text-align: right">
+      <div class="search-btn-other" style="position: initial;">
+        <a class="btn-green" @click="showAdInfoLayer('add')">+ 添加广告轮播</a>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th>图片</th>
+          <th>跳转路径</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-if="+tableData.list.length > 0">
+          <tr v-for="data in tableData.list">
+            <td><img :src="data.ad_img" style="width: 100px;"></td>
+            <td>{{ data.ad_url }}</td>
+            <td>
+              <a class="layui-btn layui-btn-normal layui-btn-xs" @click="showAdInfoLayer('edit', data)">修改</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" @click="delAd(data)">删除</a>
+            </td>
+          </tr>
+        </template>
+        <template v-else>
+          <tr><td colspan="3" class="table-null">暂无数据</td></tr>
+        </template>
+        </tbody>
+      </table>
+    </div>
+    <template v-if="temp.adDialog.showDialog">
+      <ad-info :ad-data="temp.adDialog" @page-event="getTableData"></ad-info>
+    </template>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Advertisement/adInfo"/>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      components: {
+        'ad-info': COMPONENT.AD_INFO,
+      },
+      data: function () {
+        return {
+          loadComplete: false,
+          temp: {
+            adDialog: {
+              showDialog: false,
+              dialogData: {},
+              dialogType: ''
+            }
+          },
+          tableData: {list:[]}
+        }
+      },
+      mounted: function () {
+        this.getTableData();
+      },
+      methods: {
+        getTableData: function () {
+          var self = this;
+          AppUtil.ajaxRequest({
+            url: APP + '/getAdData',
+            contentType: AppUtil.CONTENT_TYPE_JSON,
+          }).then(function (result) {
+            if(result.data != null){
+              self.tableData.list = result.data;
+            }
+            self.loadComplete = true;
+          })
+        },
+        //添加||修改弹框
+        showAdInfoLayer: function (type, item) {
+          var self = this;
+          if(type === 'add'){
+            item = {
+              "ad_img": "",
+              "ad_name": "",
+              "ad_url": "",
+              "is_show": "1"
+            }
+          }
+          var data = JSON.stringify(item);
+          self.temp.adDialog.dialogData = JSON.parse(data);
+          self.temp.adDialog.dialogType = type;
+          self.temp.adDialog.showDialog = true;
+        },
+        //删除
+        delAd: function (item) {
+          var self = this;
+          layer.confirm('', {title: '确定删除该广告轮播？', skin: 'layer-confirm'}, function (index) {
+            AppUtil.ajaxRequest({
+              url: APP + '/deleteAd',
+              data: {ad_id: item.ad_id},
+            }).then(function (result) {
+              self.getTableData();
+              layer.msg('删除成功！', {icon: 1, time: 1000});
+              layer.close(index);
+            }).catch(function () {
+              self.getTableData();
+            })
+          })
+        }
+      }
+    })
+  </script>
+</block>

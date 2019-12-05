@@ -1,0 +1,166 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+<script>
+layui.use(['form','layer','element'],function(){
+  var form = layui.form()
+  ,jq = layui.jquery
+  ,element = layui.element();
+ var status=0;
+ form.on('switch(switchTest)', function(data){
+	  loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    if(data.elem.checked){
+	    	status=1;
+	    }else{
+	    	status=2;
+	    }
+	    var url="{:U('updatestatus')}";
+	    jq.get(url,{ id: data.value, status: status },function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	        //  location.reload();
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+
+})
+</script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                {$type} 
+                <span class="tp-pos layui-breadcrumb">
+                  <if condition='ACTION_NAME eq "index"'>
+                  	<i class="layui-icon">&#xe63c;</i>
+                    <foreach name='poscate' item='v'>
+                    <a href="{:U('' . ucfirst($v['tablename']) .'/index', array('pid' => $v['id']))}">{$v.name}</a>
+                    </foreach>
+                  </if>
+                </span>  
+                </h3>
+                
+                <if condition="$subcate">
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <span class="navbar-text">子栏目：</span>
+                            <foreach name='subcate' item='v'>
+                                <a href="{:U(''. ucfirst($v['tablename']) . '/index', array('pid' => $v['id']))}" class="btn btn-sm btn-default navbar-btn">{$v.name}<notempty name="v['child']">&there4;</notempty></a>
+                            </foreach>
+                        </div>
+                    </div>
+                </nav>
+                </if>
+            </div>
+        </div>
+        
+            <div class="layui-box-searchber">
+            <if condition='ACTION_NAME eq "index"'>
+                <if condition="!$subcate">
+                <button class="layui-btn layui-btn-small" id="add" onclick="goUrl('{:U('add', array('pid'=>$pid))}')">
+                    <i class="layui-icon">&#xe608;</i> 添加产品
+                </button>
+                <else />
+                <button class="layui-btn layui-btn-disabled layui-btn-small" title="封面页不能添加内容" id="add" onclick="void(0);">
+                    <i class="layui-icon">&#xe608;</i> 添加产品
+                </button>
+                </if>
+                <button class="layui-btn layui-btn-small layui-btn-normal" onclick="toGetSubmit('{:U('move', array('pid' => $pid))}', {:C('URL_MODEL')}, '{:C('URL_PATHINFO_DEPR')}')"><i class="layui-icon">&#xe630;</i> 移动</button>
+                <button class="layui-btn layui-btn-small layui-btn-danger" data-url="{:U('del', array('batchFlag' => 1,'pid' => $pid))}"  lay-submit lay-filter="alldelete"><i class="layui-icon">&#x1006;</i> 删除</button>
+                <button class="layui-btn layui-btn-small layui-btn-warm" type="button" onclick="goUrl('{:U('trach', array('pid' => $pid))}')"><i class="layui-icon">&#xe640;</i> 回收站</button>
+                <form class="layui-form-pane" action="{:U('index')}" method="post"  >
+                    <div class="layui-inline">
+                        <label class="layui-form-label">关键词</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="keyword" value="" placeholder="请输入关键词" class="layui-input">
+                            <input type="hidden" name="pid" value="{$pid}">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn  layui-btn-small">搜索</button>
+                    </div>
+                </form>
+            <else/>
+            	<button class="layui-btn layui-btn-small" type="button" onclick="goUrl('{:U('index', array('pid'=>$pid))}')"><i class="layui-icon">&#xe603;</i> 返回</button>
+                 <button class="layui-btn layui-btn-small layui-btn-normal" data-url="{:U('restore',  array('batchFlag' => 1, 'pid' => $pid))}" lay-submit lay-filter="allrestore"><i class="layui-icon">&#xe60e;</i> 还原</button>                 
+                 <!--<button class="layui-btn layui-btn-small layui-btn-danger" type="button" onclick="doConfirmBatch('{:U('clear', array('batchFlag' => 1, 'pid' => $pid))}', '确实要彻底删除选择项吗？')"><i class="layui-icon">&#x1006;</i> 彻底删除</button> -->
+                 <button class="layui-btn layui-btn-small layui-btn-danger" data-url="{:U('clear', array('batchFlag' => 1, 'pid' => $pid))}"  lay-submit lay-filter="alldelete"><i class="layui-icon">&#x1006;</i> 彻底删除</button>
+            </if>
+            </div>
+        	<!--<hr>-->
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th width="5%" align="center"><input type="checkbox" name="checkAll" lay-filter="checkAll"></th>
+                <th>ID</th>
+                <th>标题</th>
+                <th>分类</th>
+                <th>点击</th>
+                <!--<th>发布人</th>-->
+                <th>发布时间</th>
+                <th>状态</th>
+                <th class="text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='vlist' item='v'>
+                <tr>
+                    <td><input type="checkbox" name="key[]" value="{$v.id}" lay-filter="checkOne"></td>
+                    <td>{$v.id}</td>
+                    <td class="aleft" style="color:{$v.color}">{$v.title}<if condition="$v.flag gt 0"><span style="color:#079B04;">[{$v.flag|flag2Str}]</span></if></td>
+                    <td>{$v.catename}</td>
+                    <td>{$v.click}</td>
+                    <!--<td>{$v.author}</td>-->
+                    <td>{$v.publishtime|date='Y-m-d H:i:s', ###}</td>
+                    <td>
+                    <!--<if condition="$v['status'] eq 1"><font color="#009900">已审核</font>
+                    <else/>
+                    <font color="#999999">未审核</font>
+                    </if>-->
+                    <if condition='ACTION_NAME eq "index"'>
+                    <input type="checkbox" name="status" lay-skin="switch" lay-text="通过|禁用" lay-filter="switchTest"  value="{$v['id']}" <php>echo $v['status']==1 ? 'checked' : '';</php>>
+                    <else/>
+                    <font color="#999999">已删除</font>
+                    </if>
+                    </td>
+                    <td class="text-right">
+                    <if condition='ACTION_NAME eq "index"'>
+                    <a href="{:U('edit',array('id' => $v['id'],'pid' => $pid,'p' => $_GET['p']), '')}" class="layui-btn layui-btn-normal layui-btn-mini">修改</a>
+                    <a href="javascript:;" data-url="{:U('del',array('id' => $v['id'], 'pid' => $pid,'p' => $_GET['p']), '')}" class="elementdel layui-btn layui-btn-danger layui-btn-mini">删除</a>
+                    <else/>
+                    <!--<a href="{:U('edit',array('id' => $v['id'],'pid' => $pid,'p' => $_GET['p']), '')}" class="layui-btn layui-btn-normal layui-btn-mini">修改</a>-->
+                    <a href="javascript:;" data-url="{:U('restore',array('id' => $v['id'], 'pid' => $pid,'p' => $_GET['p']), '')}" class="elementrestore layui-btn layui-btn-warm layui-btn-mini">还原</a>
+                    <a href="javascript:;" data-url="{:U('clear',array('id' => $v['id'], 'pid' => $pid,'p' => $_GET['p']), '')}" class="elementdel layui-btn layui-btn-danger layui-btn-mini">彻底删除</a>
+                    </if>
+                    </td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+		</div>	
+	</div>
+    <div class="btable-paged" >
+        <div class="layui-main">
+        	<ul class="pagination">{$page}</ul>
+        </div>
+    </div>
+</block>

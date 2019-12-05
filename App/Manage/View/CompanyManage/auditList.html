@@ -1,0 +1,85 @@
+<!--管理员：企业认证/审核中心-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="table-search">
+      <div class="search-list">
+        <div class="search-list-item">
+          <label>审核状态</label>
+          <el-select v-model="query.audit_status">
+            <el-option value="" label="全部"></el-option>
+            <el-option value="1" label="待审核"></el-option>
+            <el-option value="2" label="已审核"></el-option>
+            <el-option value="3" label="审核失败"></el-option>
+          </el-select>
+        </div>
+        <div class="search-list-item">
+          <label>认证时间</label>
+          <datetime-range v-model="query.search_time" :time_range="query.search_time"></datetime-range>
+        </div>
+        <div class="search-list-item">
+          <label>公司名称</label>
+          <el-input v-model="query.company_name" placeholder="请输入公司名称"></el-input>
+        </div>
+        <div class="search-list-item">
+          <el-select v-model="query.data_apply_status">
+            <el-option value="" label="全部"></el-option>
+            <el-option value="1" label="未申报"></el-option>
+            <el-option value="2" label="已申报"></el-option>
+          </el-select>
+        </div>
+      </div>
+      <div class="search-btn">
+        <button type="button" class="btn-default" @click="getTableData({page: 1, limit: query.limit})">搜索</button>
+        <button type="button" class="btn-default" @click="resetSearch">清空</button>
+        <button type="button" class="btn-default" @click="exportAuditList">导出</button>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th>公司名称</th>
+          <th>申报时间</th>
+          <th>创建时间</th>
+          <th>审核状态</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-if="+tableData.total > 0">
+          <tr v-for="data in tableData.list">
+            <td>{{data.company_name}}</td>
+            <td>
+              <template v-if="+data.data_apply_time === 0">未申报</template>
+              <template v-else>{{data.data_apply_time | formatDate}}</template>
+            </td>
+            <td>{{data.create_time | formatDate}}</td>
+            <td>{{ +data.audit_status === 0 ? '待审核' : (+data.audit_status === 1 ? '通过' : '未通过') }}</td>
+            <td class="">
+              <a class="layui-btn layui-btn-primary layui-btn-xs" @click="declareView(data)">查看</a>
+              <a class="layui-btn layui-btn-xs" @click="sendEmail(data)">发送邮件</a>
+              <!--<a class="layui-btn layui-btn-danger layui-btn-xs">删除</a>-->
+            </td>
+          </tr>
+        </template>
+        <template v-else>
+          <tr><td colspan="5" class="table-null">暂无审核数据</td></tr>
+        </template>
+        </tbody>
+      </table>
+      <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+    </div>
+    <template v-if="temp.auditDialog.showDialog">
+      <audit-info ref="auditLayer" :audit-data="temp.auditDialog" @page-event="getTableData"></audit-info>
+    </template>
+    <template v-if="temp.sendEmailDialog.showDialog">
+      <send-email :dialog-data="temp.sendEmailDialog"></send-email>
+    </template>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Public/components/send_email"/>
+  <include file="CompanyManage/auditInfo"/>
+  <script type="text/javascript" src="__ADMIN__/js/CompanyManage/auditList.js?v={$V}"></script>
+</block>

@@ -1,0 +1,7 @@
+#login .login-bg{padding-top: 5%}
+.login form .layui-form-item.login-imgcode input{width: 190px}
+.register .layui-form-item .register-input{width: 310px}
+.layui-input{width: 310px}
+.register h2>a{ background:url("../images/login/left_black.png") center center no-repeat; background-size:24px auto;
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/login/left_black.png',  sizingMethod='scale');
+    _filter:none;}

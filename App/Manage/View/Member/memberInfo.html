@@ -1,0 +1,161 @@
+<!--新增||编辑-会员-->
+<script type="x-template" id="member_info">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>{{ titleName }}</h3><a @click="memberData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar link-info ques-set-info">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>会员名称</label>
+              <el-input placeholder="请输入会员名称" v-model="memberData.dialogData.member_name"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>会员简称</label>
+              <el-input placeholder="请输入会员简称" v-model="memberData.dialogData.short_name"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>排序</label>
+              <el-input v-model="memberData.dialogData.sort"></el-input>
+            </div>
+            <div class="search-list-item">
+              <label>是否显示</label>
+              <div>
+                <el-switch
+                    v-model="memberData.dialogData.is_show"
+                    active-value="1"
+                    inactive-value="0"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+              </div>
+            </div>
+            <div class="search-list-item">
+              <label>是否推荐到首页</label>
+              <div>
+                <el-switch
+                    v-model="memberData.dialogData.is_recommend"
+                    active-value="1"
+                    inactive-value="0"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+              </div>
+            </div>
+            <div class="search-list-item">
+              <label>所属职务</label>
+              <el-select v-model="memberData.dialogData.title_id">
+                <el-option value="0" label="无"></el-option>
+                <el-option v-for="title in titleList" :value="title.title_id" :label="title.title_name"></el-option>
+              </el-select>
+            </div>
+            <div class="search-list-item">
+              <label style="vertical-align: top">会员logo</label>
+              <div>
+                <div class="upload-template">
+                  <img :src="memberData.dialogData.logo" class="upload-img">
+                  <button class="upload-btn" @click="uploadClick">
+                    <span v-if="memberData.dialogData.logo === ''" class="font-12">请点击上传logo</span>
+                    <span v-else class="font-12">更换logo</span>
+                    <upload-file v-model="memberData.dialogData.logo" ref="upload_file" hidden></upload-file>
+                  </button>
+                </div>
+                <p class="color-grey font-12">建议尺寸：200px * 200px</p>
+              </div>
+            </div>
+            <div class="search-list-item">
+              <label style="vertical-align: top">文章内容</label>
+              <div>
+                <textarea id="inputContent" style="height:370px; width:100%;" v-u-editor></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitMember">提交</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.all.min.js?v={$V}"></script>
+<script>
+  var ue={};
+  COMPONENT.MEMBER_INFO = {
+    template: '#member_info',
+    components:{
+      'upload-file': COMPONENT.UPLOAD_FILE_COMPONENT
+    },
+    props: {
+      memberData: Object,
+      titleList: Array
+    },
+    data: function () {
+      return {}
+    },
+    computed: {
+      titleName: function () {
+        return this.memberData.dialogType === 'edit' ? '编辑会员' : '新增会员'
+      }
+    },
+    directives: {
+      uEditor: {
+        bind: function (el) {
+          // 实例化ue实例
+          ue = UE.getEditor('inputContent', {
+            serverUrl: uEditor_url,
+          });
+        }
+      }
+    },
+    methods: {
+      loadInit: function(){
+        var self = this;
+        var content = self.memberData.dialogData.content ? self.memberData.dialogData.content : ''
+        self.$nextTick(function () {
+          ue.ready(function () {
+            ue.setContent(content);//设置编辑器的内容
+          });
+          self.$refs.upload_file.$el.value = ''
+        })
+      },
+      //提交按钮
+      submitMember: function(){
+        var self = this;
+        var content = ue.getContent()
+        self.memberData.dialogData.content = content
+        self.memberData.dialogType === 'edit' ? self.updateMember() : self.addMember()
+      },
+      //新增
+      addMember: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/addMember',
+          data: JSON.stringify(self.memberData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('添加成功', {icon: 1, time: 1000});
+          self.memberData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      //修改
+      updateMember: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/updateMember',
+          data: JSON.stringify(self.memberData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('修改成功', {icon: 1, time: 1000});
+          self.memberData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      uploadClick: function () {
+        this.$refs.upload_file.$el.click()
+      }
+    }
+  }
+</script>

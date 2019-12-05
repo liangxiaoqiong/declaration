@@ -1,0 +1,161 @@
+<!--顶部 logo + 导航菜单-->
+<script type="x-template" id="top_nav_components">
+  <div class="com-head">
+    <div class="com-top">
+      <div class="container"><img src="__DATA__/wap/images/logo.png" class="logo"></div>
+    </div>
+
+    <!--region 菜单-->
+    <a :class="temp.navShow ? 'nav-icon-close' : 'nav-icon-menu'" @click="temp.navShow = !temp.navShow"><!--移动端顶部右上角菜单icon--></a>
+    <div class="com-nav" v-if="temp.navShow">
+      <div class="nav-container">
+        <div class="nav-list" :id="navParentSelected(0)">
+          <a @click="navLink(0)">首页</a>
+        </div>
+        <template v-for="nav in navData.navList">
+          <div class="nav-list" :id="navParentSelected(nav)">
+            <a @click="navLink(nav)">{{ nav.nav_name }}</a>
+            <div class="nav-child" v-if="nav.child && nav.child.length > 0">
+              <a v-for="child in nav.child" @click="navLink(child)">{{ child.nav_name }}</a>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.TOP_NAV_COMPONENTS = {
+    template: '#top_nav_components',
+    props: {
+      thisNav: Object,
+      navData: Object,
+    },
+    watch: {
+      'thisNav.childNav.nav_id': function (val) {
+        this.nidActive = val
+      },
+      'thisNav.parentNav.nav_id': function (val) {
+        this.pidActive = val
+      }
+    },
+    data: function () {
+      return {
+        pidActive: this.thisNav.parentNav.nav_id,
+        nidActive: this.thisNav.childNav.nav_id,
+        temp: {
+          navShow: ($(document.body).width() > 1024) ? true : false,//一级导航是否显示，主要针对移动端，PC一直true
+        }
+      }
+    },
+    computed: {
+      navParentSelected: function(){
+        var self = this;
+        return function (item) {
+          var routePath = self.$route.path
+          if(routePath === '/index'){
+            if(+item === 0){
+              return 'selected'
+            }else{
+              return ''
+            }
+          }else{
+            if(+item.pid === 0){
+              if(+self.pidActive === +item.nav_id){
+                return 'selected'
+              }else{
+                return ''
+              }
+            }else{
+              if(+self.nidActive === +item.pid){
+                return 'selected'
+              }else{
+                return ''
+              }
+            }
+          }
+        }
+      }
+    },
+    created: function () {
+    },
+    mounted: function () {
+    },
+    methods: {
+      loadInit: function () {
+        var self = this;
+        var width = $(document.body).width();
+        if(width > 1024) {
+          self.temp.navShow = true;
+          //顶部一级导航菜单hover事件：展开||收缩二级菜单
+          $('.com-nav .nav-list').hover(
+            function () {
+              $('.com-nav .nav-list').removeClass('active');
+              $(this).addClass('active')
+            },function () {
+              $('.com-nav .nav-list').removeClass('active');
+            }
+          )
+          $(document).on( 'click','.com-nav .nav-list',function () {
+            $('.com-nav .nav-list').removeClass('active');
+            $(this).addClass('active')
+          })
+        }else{
+          /**移动端*/
+          self.temp.navShow = false;
+          //顶部一级导航菜单点击事件：展开||收缩二级菜单
+          $(document).on( 'click','.com-nav .nav-list>a',function () {
+            var activeNode = $(this).parent('.nav-list')
+            console.log(activeNode.hasClass("active"))
+            if(activeNode.hasClass("active")){
+              $(this).children(".nav-child").stop(false,true).slideUp();
+              activeNode.removeClass('active')
+            }else{
+              $(this).children(".nav-child").stop(false,true).slideDown();
+              activeNode.addClass('active')
+            }
+          })
+        }
+      },
+      //顶部导航链接跳转
+      navLink: function (item) {
+        var self = this;
+        if(+item === 0){
+          router.push('/')
+        }else{
+          if(typeof item.url !== 'undefined' && item.url !== ''){
+            window.open(item.url)
+          }else{
+            //PC端跳转，移动端展开
+            var nid = item.nav_id
+            var nav_type = item.nav_type
+            if(+item.pid === 0 && (typeof item.child !== 'undefined') && item.child.length > 0){
+              //默认第一个子级
+              nid = item.child[0].nav_id
+              nav_type = item.child[0].nav_type
+            }
+            switch (+nav_type) {
+              case 0:
+                router.push({ path: 'art-info', query: { nid: nid}})
+                break;
+              case 1:
+                router.push({ path: 'art-list', query: { nid: nid, p: 1}})
+                break;
+              case 2:
+                router.push({ path: 'member-list', query: { nid: nid}})
+                break;
+              case 3:
+                router.push({ path: 'expert', query: { nid: nid}})
+                break;
+              default:
+                break;
+            }
+          }
+        }
+        if(!self.$parent.isPC && +item.pid !== 0){
+          self.temp.navShow = false//针对移动端
+        }
+      },
+    }
+  }
+</script>

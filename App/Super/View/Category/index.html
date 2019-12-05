@@ -1,0 +1,101 @@
+<extend name="Public:base" />
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+<script>
+layui.use(['form'],function(){
+  var form = layui.form()
+  ,jq = layui.jquery;
+  
+ var status=0;
+ form.on('switch(switchTest)', function(data){
+	  loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    if(data.elem.checked){
+	    	status=1;
+	    }else{
+	    	status=0;
+	    }
+	    var url="{:U('updatestatus')}";
+	    jq.get(url,{ id: data.value, status: status },function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	        //  location.reload();
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+
+})
+
+$(function () {
+	//提交表单
+	$('#update').click(function () {
+		$.post("{:U('Category/sort')}", $('#form_do').serialize(),
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+});
+</script>
+</block>
+<block name="content">
+        <div class="admin-main">
+            <!--tab标签-->
+            <div class="layui-field-box layui-form">
+            <a href="{:U('Category/add')}" class="layui-btn layui-btn-small" id="add">
+                <i class="layui-icon">&#xe608;</i> 添加导航
+            </a>
+            <a href="javascript:;" class="layui-btn layui-btn-small" id="update">
+                <i class="layui-icon">&#x1002;</i> 更新排序
+            </a>
+            <form action="{:U('Category/sort')}" method="post" id="form_do" name="form_do">
+			<table class="layui-table admin-table">
+                <thead>
+                <tr>
+                    <th style="width:30px;">ID</th>
+                    <th>名称</th>
+                    <th>所属模型</th>
+                    <th>状态</th>
+                    <th>排序</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <foreach name='cate' item='v'>
+                    <tr>
+                        <td>{$v.id}</td>
+                        <td class="aleft">{$v.delimiter}<if condition="$v['pid'] neq 0">├─</if><a href="<if condition='$v.type eq 0'>{:U(''.ucfirst($v['tablename']). '/index', array('pid' => $v['id']))}<else/>{:U('Category/edit',array('id' => $v['id']))}</if>">{$v.name}</a></td>
+                        <td ><if condition='$v.type eq 1'><span style="color:red">外部链接</span><else/>{$v.modelname}</if></td>
+                        <td>
+                        <input type="checkbox" name="status" lay-skin="switch" lay-text="显示|隐藏" lay-filter="switchTest"  value="{$v['id']}" <php>echo $v['status']==1 ? 'checked' : '';</php>>
+                        </td>
+                        <td><input type="text" name="sortlist[{$v.id}]" value="{$v.sort}" id="sortlist" size="5" class="form-control" /></td>
+                        <td class="text-right">
+
+                        <a href="{:U('Category/add',array('pid' => $v['id']))}" class="layui-btn layui-btn-mini">添加子栏目</a>
+                        <a href="{:U(''.ucfirst($v['tablename']). '/index', array('pid' => $v['id']))}" class="layui-btn layui-btn-normal layui-btn-mini">列表</a>
+                        <a href="{:U('Category/edit',array('id' => $v['id']))}" class="layui-btn layui-btn-warm layui-btn-mini">修改</a>
+                        <a href="javascript:;" data-id="{$vo.id}" data-url="{:U('Category/del', array('id' => $v['id']))}" data-opt="del"  class="elementdel layui-btn layui-btn-danger layui-btn-mini ajax-delete">删除</a>
+                        </td>
+                    </tr>
+                </foreach>
+                </tbody>
+            </table>
+            </form>
+        </div>
+    </div>
+</block>

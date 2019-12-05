@@ -1,0 +1,166 @@
+<extend name="Public:base" />
+<block name="header_js">
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.all.min.js"></script>
+<script type="text/javascript">
+$(function(){
+    var ue = UE.getEditor('inputContent3',{
+        serverUrl :"{:U('Public/editorMethod')}"
+    });
+})
+</script>
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe642;</i> 
+                {$type}
+                </h3>
+            </div>
+            
+        </div>
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('edit')}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">名称</label>
+                <div class="layui-input-inline">
+                	<input type="text" name="name" value="{$vo.name}" required lay-verify="required" placeholder="名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">类型</label>
+                <div class="layui-input-inline" style="z-index:1000;">
+                    <select name="blocktype" id="inputBlocktype" lay-filter="inputBlocktype">
+                        <foreach name='blocktypelist' item='v'>
+                        <option value="{$key}" <if condition="$vo['blocktype'] eq $key">selected="selected"</if>>{$v}</option>
+                        </foreach>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item" id="content_1" style="display:none;">
+                <label class="layui-form-label">内容</label>
+                <div class="layui-input-block">
+                    <textarea name="content[1]" class="layui-textarea" style="width:80%;">{$vo.content}</textarea>
+                </div>
+            </div>
+            <div id="content_2" style="display:none;">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缩略图</label>
+                    <div class="layui-input-inline" style="width:30%;">
+                        <input type="text" name="content[2]" value="{$vo.content}" placeholder="缩略图" class="layui-input" id="litpic">
+                    </div>
+                    <div class="layui-input-inline">
+                        <input type="file" name="myimage" class="layui-upload-file" id="image">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <div class="layui-input-inline" style="width:30%;">
+                        <div id="litpic_show"><if condition="$vo['content']"><img src="{$vo.content}" width="100%" /></if></div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="content_3" style="display:none;">
+                <label class="layui-form-label">内容</label>
+                <div class="layui-input-block">
+                    <textarea name="content[3]" id="inputContent3" style="height:370px; width:99%;">{$vo.content}</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">自由块说明</label>
+                <div class="layui-input-block">
+                    <textarea name="remark" class="layui-textarea" style="width:60%;">{$vo.remark}</textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                    <input type="hidden" name="id" value="{$vo.id}" />
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>更新 </button>
+                    <button onclick="history.go(-1);" class="layui-btn layui-btn-primary layui-btn-small"><i class="layui-icon">&#xe603;</i>返回 </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--<script type="text/javascript" src="__ADMIN__/js/formadd.js"></script>-->
+<script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  //模型select联动
+	  form.on('select(inputBlocktype)', function(data){
+		var type = data.value;
+		select_type(type);
+		form.render('select');
+	  });
+	  
+	  //上传缩略图
+	  layui.upload({
+		url: "{:U('Public/upload',array('img_flag' => 1))}"
+		,elem:'#image'
+		,before: function(input){
+		  loading = layer.load(2, {
+			shade: [0.2,'#000']
+		  });
+		}
+		,success: function(res){
+			var img = res.info[0].url;//原图
+			var timg = res.info[0].turl;//缩略图
+			layer.close(loading);
+			jq('#litpic').val(img);
+			jq('#litpic_show').html("<img src='"+timg+"' width='100%'>");
+			layer.msg('上传成功！', {icon: 1, time: 1000});
+		}
+	  });
+	  
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	
+	$(function(){
+		$("#content_{$vo.blocktype}").show();
+		/*$('#inputBlocktype').change(function(event) {
+			var type = $(this).val();
+			select_type(type);
+		});*/
+	});
+	
+	function select_type(id) {
+		$("#content_1").hide();
+		$("#content_2").hide();
+		$("#content_3").hide();
+		$("#content_"+id).show();
+	}
+</script>
+</block>

@@ -1,0 +1,23 @@
+{
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "array",
+    "properties": {
+      "option_id": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": false,
+        "pattern": "^\\d+$"
+      },
+      "option_value": {
+        "type": "string",
+        "required": true,
+        "pattern": "\\S+"
+      }
+    },
+    "required": true
+  }
+}

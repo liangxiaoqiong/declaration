@@ -1,0 +1,252 @@
+<!--操作日志列表-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak>
+    <div class="search-content2">
+      <ul>
+        <li class="search-time">
+          <b class="align-middle">操作时间</b>
+          <div class="search-time-div align-middle" style="width: 216px;">
+            <input type="text" placeholder="开始时间" id="time_min" v-lay-date="query" data-attr="time_min"
+                   class="layui-input" readonly="">
+            <em>-</em>
+            <input type="text" placeholder="结束时间" id="time_max" v-lay-date="query" data-attr="time_max"
+                   class="layui-input" readonly="">
+          </div>
+          <a class="color-default" @click="setTime(1)">昨日</a>
+          <a class="color-default" @click="setTime(3)">近3日</a>
+          <a class="color-default" @click="setTime(30)">近30日</a>
+        </li>
+        <li>
+          <b class="align-middle">操作者</b>
+          <input type="text" v-model="query.name" class="layui-input display-align" style="width: 150px;"
+                 placeholder="输入操作者账号">
+        </li>
+      </ul>
+      <button class="btn82-white display-align" @click="getList(1, 20)">搜索</button>
+    </div>
+    <div>
+      <table class="table-default">
+        <thead>
+        <tr>
+          <th width="10%">编号</th>
+          <th width="15%">操作者</th>
+          <th width="15%">操作时间</th>
+          <th width="15%">IP地址</th>
+          <th width="30%" style="text-align: left;padding-left:5%;">操作记录</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="log in list">
+          <td width="10%">{{ log.log_id }}</td>
+          <td width="15%">{{ log.admin_name }}</td>
+          <td width="15%">{{ log.create_time }}</td>
+          <td width="15%">{{ log.ip }}</td>
+          <td width="30%" style="text-align: left;padding-left:5%;">{{ log.desc }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+
+  <script>
+    (function (window) {
+      var AppUtil = window.AppUtil
+      var rootPath = window.ThinkPHP.APP
+      var publicObj = window.publicObj
+      var vm = new Vue({
+
+          el: '#app',
+
+          created: function () {
+            this.getList()
+          },
+
+          data: function () {
+            return {
+
+              /*内容*/
+              query: {
+                page: 1,
+                limit: 20,
+                name: '',
+                time_min: '',
+                time_max: '',
+              },
+
+              list: [],
+              total: [],
+
+            }
+          },
+
+          computed: {},
+
+          directives: {
+            layDate: {
+              bind: function (el, binding) {
+                // 获得分段索引
+                var attr = $(el).attr('data-attr')
+                // 保存当前分段的日期实例
+                laydate.render({
+                  elem: el,
+                  type: 'datetime',
+                  done: function (value, date, endDate) {
+                    binding.value[attr] = value
+                  }
+                });
+              },
+            },
+          },
+
+          methods: {
+
+            dateTime: function (time_) {
+              var pad = this.pad
+              var Y = time_.getFullYear();    //获取完整的年份(4位,1970-????)
+              var M = pad(time_.getMonth() + 1, 2);       //获取当前月份(0-11,0代表1月)
+              var D = pad(time_.getDate(), 2);        //获取当前日(1-31)
+              var H = pad(time_.getHours(), 2);       //获取当前小时数(0-23)
+              var Min = pad(time_.getMinutes(), 2);     //获取当前分钟数(0-59)
+              var S = pad(time_.getSeconds(), 2);     //获取当前秒数(0-59)
+              var dataTime = Y + '-' + M + '-' + D + ' ' + H + ':' + Min + ':' + S;
+              return dataTime;
+            },
+
+            pad: function (num, n) {
+              var len = num.toString().length;
+              while (len < n) {
+                num = "0" + num;
+                len++;
+              }
+              return num;
+            },
+
+            setTime: function (t) {
+              var self = this
+              var nowTimeStamp = new Date(NOW_STR + ' 00:00:00')
+              nowTimeStamp = nowTimeStamp.getTime()
+              var timeSecond = nowTimeStamp + 24 * 60 * 60 * 1000 - 1 - 86400000;//获取昨天23:59:59的毫秒数
+              if (t === 1) {
+                var val1 = new Date(nowTimeStamp - 3600 * 24 * 1000);
+                var start = self.dateTime(val1);
+                var val2 = new Date(nowTimeStamp - 1);
+                var end = self.dateTime(val2);
+              } else {
+                var val1 = new Date(nowTimeStamp - 3600 * 24 * 1000 * t + 3600 * 24 * 1000);
+                var start = self.dateTime(val1);
+                var val2 = new Date(nowTimeStamp + 3600 * 24 * 1000 - 1);
+                var end = self.dateTime(val2);
+              }
+
+              self.setTimeRange(start, end)
+            },
+
+            /*设置时间范围*/
+            setTimeRange: function (start, end) {
+              var self = this
+              self.query.time_min = start
+              self.query.time_max = end
+              laydate.render({elem: '#time_min', value: start});
+              laydate.render({elem: '#time_max', value: end})
+            },
+
+            yesterday: function () {
+              days = days || 0
+              var time = new Date(NOW_STR)
+              time = time.getTime() + 3600 * 24 * 1000 * days
+              time = new Date(time)
+              time = publicObj.formatDate(time, AppUtil.DATE_FORMAT)
+            },
+
+            /*重置查询条件*/
+            clearQuery: function () {
+              var self = this
+              self.query = JSON.parse(self.oldQuery)
+              laydate.render({elem: '#time_min', value: ' '});
+              laydate.render({elem: '#time_max', value: ' '});
+            },
+
+            /*获取列表*/
+            getList: function (page, limit, callback) {
+              var self = this;
+              if (page) {
+                self.query.page = page;
+              }
+              if (limit) {
+                self.query.limit = limit;
+              }
+              self.query.action = 'query'
+              AppUtil.ajaxRequest({
+                url: rootPath + '/Rbac/logList',
+                data: self.query,
+                type: 'post'
+              }).then(function (result) {
+                self.list = result.data.list
+                self.total = result.data.total
+                if (typeof callback === 'function') {
+                  callback()
+                }
+                //分页layui
+                layui.use(['laypage'], function () {
+                  var laypage = layui.laypage;
+                  laypage({
+                    cont: 'page'//ID，不加#
+                    , pages: Math.ceil(self.total / self.query.limit)
+                    , curr: self.query.page
+                    , skip: true
+                    , skin: '#707cd2'
+                    , jump: function (obj, first) {
+                      if (!first) {
+                        self.query.page = obj.curr;
+                        self.getList(obj.curr, self.query.limit);
+                      }
+                    }
+                  });
+                })
+
+              });
+            },
+
+            /*添加、编辑员工弹框*/
+            staffInfoLayer: function (employee) {
+              var self = this
+              var title = '添加'
+              if (employee.id > 0) {
+                title = '编辑'
+              }
+              publicObj.layerShow(2, title + '员工', rootPath + '/Index/staffInfo' + '&id=' + employee.id)
+            },
+
+            afterEditStaff: function () {
+              var self = this
+              self.getList()
+            },
+
+            /*删除员工*/
+            staffDel: function (admin) {
+              var self = this
+              layer.confirm('', {title: '确定删除该员工账号？', skin: 'layer-confirm'}, function (index) {
+                AppUtil.ajaxRequest({
+                  url: rootPath + '/Rbac/delUser',
+                  data: {
+                    id: admin.id
+                  }
+                }).then(function (result) {
+                  self.getList()
+                  publicObj.layerMsg(result.msg, AppUtil.SUCCESS);
+                }).catch(function (result) {
+
+                })
+              })
+            }
+
+          }
+        })
+      ;
+      window.vm = vm;
+    })(window);
+  </script>
+
+</block>

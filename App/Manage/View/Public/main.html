@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{:get_cfg_value('CFG_WEBTITLE')}</title>
+  <link rel="stylesheet" href="__ADMIN__/plugins/layui/css/layui.css" media="all"/>
+  <link rel="stylesheet" href="__ADMIN__/css/main.css?v={$V}" media="all"/>
+  <link rel="stylesheet" href="__ADMIN__/css/admin.css?v={$V}" media="all"/>
+  <!--[if lt IE 9]>
+  <script src="__DATA__/static/js/html5shiv.min.js"></script>
+  <script src="__DATA__/static/js/respond.min.js"></script>
+  <![endif]-->
+  <script type="text/javascript" src="__DATA__/static/js/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="__ADMIN__/plugins/layui/layui.js"></script>
+  <script type="text/javascript" src="__DATA__/static/jq_plugins/layer/layer.js"></script>
+  <script type="text/javascript" src="__DATA__/static/js/public.js?v={$V}"></script>
+</head>
+<body>
+<!--主体-->
+<div style="margin-bottom:36px;">
+  <div class="tpt—index fly-panel fly-panel-user">
+   <!-- <div style="margin-bottom: 10px;">
+      <button class="layui-btn" onclick="syncAuth()">重新获取权限</button>
+    </div>-->
+    <blockquote style="padding: 10px;border-left: 5px solid #009688;" class="layui-elem-quote">使用指南：</blockquote>
+    <table width="100%">
+      <tr>
+        <td width="110px">第一步：</td>
+        <td>企业认证 —> 认证审核</td>
+      </tr>
+      <tr>
+        <td>第二步：</td>
+        <td>问卷调查填写 —> 问卷查看</td>
+      </tr>
+      <tr>
+        <td>第三步</td>
+        <td>每月数据申报 —> 数据申报审核</td>
+      </tr>
+    </table>
+
+    <blockquote style="padding: 10px;border-left: 5px solid #009688;" class="layui-elem-quote">介绍：</blockquote>
+    <table width="100%">
+      <tr>
+        <td width="110px">主办单位</td>
+        <td>{:get_cfg_value('CFG_MAIN_UNIT')}</td>
+      </tr>
+      <tr>
+        <td>承办单位</td>
+        <td>{:get_cfg_value('CFG_DO_UNIT')}</td>
+      </tr>
+      <tr>
+        <td>技术支持</td>
+        <td>{:get_cfg_value('CFG_TECHNICAL_SUPPORT')}</td>
+      </tr>
+      <tr>
+        <td>联系方式</td>
+        <td>{:get_cfg_value('CFG_PHONE')}</td>
+      </tr>
+      <tr>
+        <td>传真</td>
+        <td>{:get_cfg_value('CFG_FAX')}</td>
+      </tr>
+    </table>
+    <blockquote style="padding: 10px;border-left: 5px solid #009688;" class="layui-elem-quote">联系我们：</blockquote>
+    <table width="100%">
+      <tr>
+        <td width="110px">地址</td>
+        <td>{:get_cfg_value('CFG_ADDRESS')}</td>
+      </tr>
+      <tr>
+        <td>邮编</td>
+        <td>{:get_cfg_value('CFG_ZIP_CODE')}</td>
+      </tr>
+      <tr>
+        <td>电话</td>
+        <td>{:get_cfg_value('CFG_PHONE')}</td>
+      </tr>
+      <tr>
+        <td>传真</td>
+        <td>{:get_cfg_value('CFG_FAX')}</td>
+      </tr>
+      <tr>
+        <td>网址</td>
+        <td><a href="//{:get_cfg_value('CFG_WEBURL')}" target="_blank">{:get_cfg_value('CFG_WEBURL')}</a></td>
+      </tr>
+    </table>
+    <blockquote style="padding: 10px;border-left: 5px solid #009688;" class="layui-elem-quote">开发团队：</blockquote>
+    <table width="100%">
+      <tr>
+        <td width="110px">版权所有</td>
+        <td>{:get_cfg_value('CFG_POWERBY')}</td>
+      </tr>
+      <tr>
+        <td>敬告</td>
+        <td>严禁删除、隐藏或更改版权信息，否则导致的一切损失由使用者自行承担。</td>
+      </tr>
+    </table>
+  </div>
+</div>
+</body>
+<php>
+  if ($ADMIN['usertype'] == NORMAL_ADMIN && $ADMIN['auth_status'] == COMPANY_AUTH_STATUS_NO) {
+  $auth_status =  '0';
+  }else{
+  $auth_status =  '1';
+  }
+</php>
+<script>
+  var data_apply_status = "{$ADMIN['data_apply_status']}";
+  var auth_status = "{$auth_status}";
+  if(+auth_status === 1 && +data_apply_status === 0){
+    layer.confirm('当月数据申报暂未填写，请及时进行数据申报', {title: '系统提示', skin: 'layer-confirm', zIndex: '99'}, function (index) {
+      window.location.href = 'admin.php?s=/Company/dataApplyList';
+    })
+  }
+  var APP = '__APP__';
+  syncAuth()
+  function syncAuth () {
+    $.ajax({
+      url: APP + '/syncAuth',
+      success: function (result) {
+
+      },
+      error: function (result) {
+      }
+    })
+  }
+</script>
+<!--2018申报数据填写-->
+<if condition="$ADMIN['data_apply_2018_status'] eq 0">
+  <div id="app" v-cloak="">
+    <data-apply-2018 v-if="myApplyDialog.showDialog" :my-apply-data="myApplyDialog"></data-apply-2018>
+  </div>
+  <script type="text/javascript" src="__VUE__"></script>
+  <script language="JavaScript">
+    <!--
+    var URL = '__URL__';
+    var APP = '__APP__';
+    var SELF = '__SELF__';
+    var PUBLIC = '__PUBLIC__';
+    var data_path = "__DATA__";
+    var tpl_public = "__PUBLIC__";
+    var REQ = '{$reqJson}';
+    var NOW_STR = "{$NOW_STR}";
+    REQ = JSON.parse(REQ);
+    //-->
+    /*
+  define('CODE_SUCCESS', 200); // 请求成功
+  define('CODE_LOGIN_SUCCESS', 201); // 登录成功后跳转
+  define('CODE_REDIRECT', 301); // 请求后直接重定向
+  define('CODE_ERROR', 406); // 请求失败
+  define('CODE_LOGOUT', 401); // 登录过期 提示过期后会重定向
+  define('CODE_NOT_FOUND', 404); // 不存在
+     */
+    var ThinkPHP = window.Think = {
+      "ROOT": "__ROOT__",
+      "APP": "__APP__",
+      "PUBLIC": "__PUBLIC__",
+      "DEEP": "{:C('URL_PATHINFO_DEPR')}",
+      "MODEL": ["{:C('URL_MODEL')}", "{:C('URL_CASE_INSENSITIVE')}", "{:C('URL_HTML_SUFFIX')}"],
+      "VAR": ["{:C('VAR_MODULE')}", "{:C('VAR_CONTROLLER')}", "{:C('VAR_ACTION')}"],
+      CODE_SUCCESS: +'{$Think.CODE_SUCCESS}',
+      CODE_REDIRECT: +'{$Think.CODE_REDIRECT}',
+      CODE_ERROR: +'{$Think.CODE_ERROR}',
+      CODE_LOGOUT: +'{$Think.CODE_LOGOUT}',
+      CODE_NOT_FOUND: +'{$Think.CODE_NOT_FOUND}',
+      CODE_LOGIN_SUCCESS: +'{$Think.CODE_LOGIN_SUCCESS}',
+    }
+    // VUE组件存储对象
+    var COMPONENT = {}
+  </script>
+  <include file="Company:dataApply2018Modify"/>
+</if>
+<script>
+  var data_apply_2108_status = "{$ADMIN['data_apply_2018_status']}"; //获取2018是否有填报数据 0为未填报 1-为已填报
+  if(+auth_status === 1 && +data_apply_2108_status !== 1){
+    new Vue({
+      el: '#app',
+      components: {
+        'data-apply-2018': COMPONENT.MY_APPLY_MODIFY_2018
+      },
+      data: function () {
+        return {
+          myApplyDialog: {
+            showDialog: false,
+            dialogData: {},
+            dialogType: '',//edit,view,add
+          }
+        }
+      },
+      mounted: function () {
+        this.getDataApply2018()
+      },
+      methods: {
+        getDataApply2018: function () {
+          var self = this;
+          $.ajax({
+            url: APP + '/getOldDataApply',
+            type: 'get',
+            success: function (result) {
+              if(typeof result.data.data_id === 'undefined'){
+                var date = (new Date(publicObj.getPreMonth()))/1000;
+                self.myApplyDialog.dialogData = {
+                  "apply_time": date,//"string,申报时间。年月的时间戳",
+                  "income_output_value": "",//"string,营业收入产值(万元)。整数",
+                  "export_value": "",//"string,出口额总额(万元)。整数",
+                  "investment_value": "",//"string,投资额总价(万元)",
+                  "profit_value": "",//"string,利润总额(万元)",
+                  "taxes_value": "",//"string,纳税总额(万元)",
+                  "dev_people_value": "",//"string,本月研发人员数",
+                  "invention_patent_value": "",//"string,发明专利",
+                  "utility_patent_value": "",//"string,实用新型专利",
+                  "facade_patent_value": "",//"string,外观设计专利",
+                  "software_copyright_value": "",//"string,软件著作权",
+                  "other_value": "",//"string,其他",
+                }
+                self.myApplyDialog.dialogType = 'add'
+              }else{
+                self.myApplyDialog.dialogData = result.data
+                  self.myApplyDialog.dialogType = 'edit'
+              }
+              self.myApplyDialog.showDialog = true
+            }
+          })
+        }
+      }
+    })
+  }
+</script>
+</html>

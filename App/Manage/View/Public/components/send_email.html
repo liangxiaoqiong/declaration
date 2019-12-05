@@ -1,0 +1,58 @@
+<script type="x-template" id="send_email_components">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>发送邮件</h3><a @click="dialogData.showDialog = false"></a></div>
+      <div class="dialog-main send-email">
+        <div>
+          <h3><b class="color-red">*</b>邮件标题</h3>
+          <input type="text" placeholder="请输入邮件标题" v-model="query.title" class="myui-input">
+        </div>
+        <div>
+          <h3>邮件正文</h3>
+          <textarea placeholder="请输入邮件正文" v-model="query.message" class="myui-textarea"></textarea>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitSend">发送</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.SEND_EMAIL_COMPONENTS = {
+    template: '#send_email_components',
+    props: {
+      dialogData: Object,
+    },
+    data: function () {
+      return {
+        query: {
+          company_id: this.dialogData.company_id,
+          title: '',
+          message: ''
+        }
+      }
+    },
+    methods: {
+      submitSend: function () {
+        var self = this;
+        if(self.query.title === ''){
+          layer.msg('请输入邮件标题', {icon: 2, anim: 6, time: 1000});
+          return false;
+        }
+        if(self.query.message === ''){
+          layer.msg('请输入邮件正文', {icon: 2, anim: 6, time: 1000});
+          return false;
+        }
+        AppUtil.ajaxRequest({
+          url: APP + '/sendEmail',
+          data: JSON.stringify(self.query),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('发送成功', {icon: 1, time: 1000});
+          self.dialogData.showDialog = false;
+        })
+      }
+    }
+  }
+</script>

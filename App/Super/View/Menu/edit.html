@@ -1,0 +1,126 @@
+<extend name="Public:base" />
+<block name="header_js">
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe642;</i> 
+                修改菜单
+                </h3>
+            </div>
+            
+        </div>
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('edit')}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">上级菜单</label>
+                <div class="layui-input-inline">
+                    <select name="pid" class="form-control">
+                        <option value="0">顶级菜单</option>
+                        <foreach name='cate' item='v'>
+                        <option value="{$v.id}" <if condition="$data['pid'] eq $v['id']">selected="selected"</if>>{$v.delimiter}{$v.name}</option>
+                        </foreach>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" value="{$data.name}" required lay-verify="required" placeholder="菜单名称" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">模块名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="module" value="{$data.module}" placeholder="模块名：首字母大写" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">方法名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="action" value="{$data.action}" placeholder="方法名：首字母小大写" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">附加参数</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="parameter" value="{$data.parameter}" placeholder="附加参数" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="sort" value="{$data.sort}" placeholder="排序" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">图标</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="icon" value="{$data.icon}" placeholder="图标" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="status" value="1" title="显示" <if condition="$data['status'] eq 1">checked="checked"</if> />
+                    <input type="radio" name="status" value="0" title="隐藏" <if condition="$data['status'] eq 0">checked="checked"</if> />
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                    <input type="hidden" name="id" value="{$data.id}"/>
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>更新 </button>
+                    <button type="button" onclick="history.go(-1);" class="layui-btn layui-btn-primary layui-btn-small"><i class="layui-icon">&#xe603;</i>返回 </button>
+                    </div>
+                 </div>
+             </div>
+         </form>
+    </div>
+    <script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          // location.href = data.url;
+            history.go(-1)
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	</script>
+</block>

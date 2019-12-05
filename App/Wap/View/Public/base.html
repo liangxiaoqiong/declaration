@@ -1,0 +1,46 @@
+<script language="JavaScript">
+  garden_id = "{$gid}";	  //园区ID
+  var URL = '__URL__';
+  var APP = '__APP__';
+  var SELF = '__SELF__';
+  var PUBLIC = '__PUBLIC__';
+  var data_path = "__DATA__";
+  var tpl_public = "__PUBLIC__";
+  var REQ = '{$reqJson}';
+  REQ = JSON.parse(REQ);
+
+  /*
+define('CODE_SUCCESS', 200); // 请求成功
+define('CODE_LOGIN_SUCCESS', 201); // 登录成功后跳转
+define('CODE_REDIRECT', 301); // 请求后直接重定向
+define('CODE_ERROR', 406); // 请求失败
+define('CODE_LOGOUT', 401); // 登录过期 提示过期后会重定向
+define('CODE_NOT_FOUND', 404); // 不存在
+   */
+  var ThinkPHP = window.Think = {
+    "ROOT": "__ROOT__",
+    "APP": "__APP__",
+    "PUBLIC": "__PUBLIC__",
+    "DEEP": "{:C('URL_PATHINFO_DEPR')}",
+    "MODEL": ["{:C('URL_MODEL')}", "{:C('URL_CASE_INSENSITIVE')}", "{:C('URL_HTML_SUFFIX')}"],
+    "VAR": ["{:C('VAR_MODULE')}", "{:C('VAR_CONTROLLER')}", "{:C('VAR_ACTION')}"],
+    CODE_SUCCESS: +'{$Think.CODE_SUCCESS}',
+    CODE_REDIRECT: +'{$Think.CODE_REDIRECT}',
+    CODE_ERROR: +'{$Think.CODE_ERROR}',
+    CODE_LOGOUT: +'{$Think.CODE_LOGOUT}',
+    CODE_NOT_FOUND: +'{$Think.CODE_NOT_FOUND}',
+    CODE_LOGIN_SUCCESS: +'{$Think.CODE_LOGIN_SUCCESS}',
+  }
+
+  // VUE组件存储对象
+  var COMPONENT = {}
+</script>
+<script type="text/javascript" src="__DATA__/static/jq/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="__DATA__/static/jq_plugins/MSClass.js"></script>
+<script type="text/javascript" src="__DATA__/static/jq_plugins/swiper/swiper.min.js"></script>
+<script type="text/javascript" src="__DATA__/static/jq_plugins/vue-2.x/vue.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script type="text/javascript" src="__DATA__/static/jq_plugins/element-ui/2.4.3/index.js"></script>
+<script type="text/javascript" src="__DATA__/static/jq_plugins/layer/layer.js"></script>
+<script type="text/javascript" src="__DATA__/static/jq_plugins/util/AppUtil.js"></script>
+<script type="text/javascript" src="__DATA__/static/js/public.js?v={$V}"></script>

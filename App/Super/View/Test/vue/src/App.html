@@ -1,0 +1,31 @@
+<!-- template -->
+<script type="x-template" id="app_component">
+  <!--region 模版-->
+  <div>
+    <div>
+      <a @click="goTo('form')">表单</a>
+    </div>
+    <router-view></router-view>
+  </div>
+  <!--endregion-->
+</script>
+
+<!-- JS -->
+<script>
+  var APP_COMPONENT = {
+    template: '#app_component',
+    components: {},
+    props: {},
+    computed: {},
+    mounted: function () {
+    },
+    data: function () {
+      return {}
+    },
+    methods: {
+      goTo: function (path) {
+        this.$router.replace('/' + path)
+      }
+    }
+  }
+</script>

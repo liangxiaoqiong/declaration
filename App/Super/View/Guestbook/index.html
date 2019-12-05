@@ -1,0 +1,79 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                    {$type} 
+                    </h3>
+                </div>
+            </div>
+        	
+            <div class="layui-box-searchber">
+            	<!--<button class="layui-btn layui-btn-small" onclick="goUrl('{:U('add')}')"><i class="layui-icon">&#xe608;</i> 我要留言</button>-->
+                <button class="layui-btn layui-btn-small layui-btn-danger" data-url="{:U('del', array('batchFlag' => 1))}"  lay-submit lay-filter="alldelete"><i class="layui-icon">&#x1006;</i> 删除</button>
+                   
+            </div>
+        	<!--<hr>-->
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th width="5%" align="center"><input type="checkbox" name="checkAll" lay-filter="checkAll"></th>
+                <th>ID</th>
+                <th>标题</th>
+                <th>主页</th>
+                <th>联系方式</th>
+                <th>留言</th>
+                <th class="text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='vlist' item='v'>
+                <tr>
+                    <td><input type="checkbox" name="key[]" value="{$v.id}" lay-filter="checkOne"></td>
+                    <td>{$v.id}</td>
+                    <td>{$v.title}</td>
+                    <td>{$v.homepage}</td>
+                    <td>
+                        <p>
+                        <strong>姓名：</strong><if condition="$v['userid']"><a href="{$v.userid}" target="_blank">{$v.username}</a><else/>{$v.username}</if>
+                        <strong>来自：</strong>{$v.ip} <strong>电话：</strong>{$v.tel} <strong>QQ：</strong>{$v.qq}<br/>
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                        <strong>留言：</strong>{$v.content} [{$v.posttime|date='Y-m-d H:i:s', ###}]<br/>
+                        </p>
+                        <if condition="$v['replytime']">
+                        <p>
+                        <strong>回复：</strong>{$v.reply} [{$v.replytime|date='Y-m-d H:i:s', ###}]
+                        </p>
+                        </if>
+                     </td>
+                    <td class="text-right">
+                    <a href="{:U('reply',array('id' => $v['id']), '')}" class="layui-btn layui-btn-normal layui-btn-mini">回复</a>
+                    <a href="javascript:;" data-url="{:U('del',array('id' => $v['id']), '')}" class="elementdel layui-btn layui-btn-danger layui-btn-mini">删除</a>
+                    </td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+		</div>	
+        
+	</div>
+    <div class="btable-paged" >
+        <div class="layui-main">
+        	<ul class="pagination">{$page}</ul>
+        </div>
+    </div>
+</block>

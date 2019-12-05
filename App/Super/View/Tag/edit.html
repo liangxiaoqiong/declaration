@@ -1,0 +1,78 @@
+<extend name="Public:base" />
+<block name="header_js">
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe642;</i> 
+                修改标签  
+                </h3>
+            </div>
+            
+        </div>
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('edit')}">
+                    
+            <div class="layui-form-item">
+                <label class="layui-form-label">标签名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="tag_name" value="{$vo.tag_name}" required lay-verify="required" placeholder="标签名称" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="tag_sort" value="{$vo.tag_sort}" placeholder="排序" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                    <input type="hidden" name="tag_id" value="{$vo.tag_id}" />
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>更新 </button>
+                    <button onclick="history.go(-1);" class="layui-btn layui-btn-primary layui-btn-small"><i class="layui-icon">&#xe603;</i>返回 </button>
+                    </div>
+                 </div>
+             </div>
+         </form>
+    </div>
+    <script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	</script>
+</block>

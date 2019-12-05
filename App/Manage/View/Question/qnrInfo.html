@@ -1,0 +1,122 @@
+<!--管理员：新增||编辑||查看问卷调查设置-->
+<script type="x-template" id="qnr_set_info">
+  <div class="dialog-default">
+    <div class="dialog-body" style="width: 90%;">
+      <div class="dialog-head"><h3>{{qnrData.qnr_name}}</h3><a @click="quesSetData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar ques-set-info">
+        <!--region 问卷基本项-->
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>问卷名称</label>
+              <el-input placeholder="请输入问卷名称" style="width: 200px;" v-model="qnrData.qnr_name"></el-input>
+            </div>
+<!--            <div class="search-list-item">
+              <label>是否开启</label>
+              <el-switch
+                  v-model="qnrData.is_open"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>
+            <div class="search-list-item">
+              <label>是否强制</label>
+              <el-switch
+                  v-model="qnrData.is_force"
+                  active-value="1"
+                  inactive-value="0"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>-->
+          </div>
+        </div>
+        <!--endregion 问卷基本项-->
+
+        <!--region 答卷题目列表-->
+        <div class="ques-set-list">
+          <el-collapse>
+            <template v-for="(data, data_i) in qnrData.questions">
+              <el-collapse-item>
+                <template slot="title">
+                  <div class="ques-topic">
+                    <h1>题目{{data_i+1}}、{{data.question_title}}</h1>
+                    <div class="topic-action">
+                      <a @click.stop="editTopic(data)" class="fa fa-edit" title="修改题目"></a>
+                      <a @click.stop="delQuestion(data_i)" class="fa fa-trash-o" title="删除题目"></a>
+                      <a @click.stop="moveUpQuestion(data, data_i)" class="fa fa-arrow-up" title="上移题目"></a>
+                      <a @click.stop="moveDownQuestion(data, data_i)" class="fa fa-arrow-down" title="下移题目"></a>
+                    </div>
+                  </div>
+                </template>
+                <div class="collapse-content">
+                  <dl>
+                    <dt>是否显示：</dt>
+                    <dd><el-checkbox v-model="data.is_show" true-label="1" false-label="0">显示</el-checkbox></dd>
+                  </dl>
+                  <dl>
+                    <dt>是否必答：</dt>
+                    <dd><el-checkbox v-model="data.is_require" true-label="1" false-label="0">必答</el-checkbox></dd>
+                  </dl>
+                  <dl>
+                    <dt>请选择答卷类型：</dt>
+                    <dd>
+                      <el-radio-group v-model="data.answer_type">
+                        <el-radio label="0">文本框</el-radio>
+                        <el-radio label="1">单选项</el-radio>
+                        <el-radio label="2">多选项</el-radio>
+                      </el-radio-group>
+                    </dd>
+                  </dl>
+                  <!--region 答题区域项 start-->
+                  <!--文本框-->
+                  <dl v-if="+data.answer_type === 0">
+                    <dd style="width: 100%">
+                      <el-input type="textarea" disabled placeholder="答题区域"></el-input>
+                    </dd>
+                  </dl>
+                  <!--单选项||多选项-->
+                  <dl v-else>
+                    <dt>请填写答卷选项：</dt>
+                    <dd>
+                      <el-tag
+                          v-for="(option, index) in data.options"
+                          :key="index"
+                          closable
+                          :disable-transitions="false"
+                          @close="delOption(data.options, index)">
+                        {{option.option_value}}
+                      </el-tag>
+                      <el-input
+                          class="input-new-tag"
+                          v-if="temp.inputVisible"
+                          v-model="temp.inputValue"
+                          :id="'saveTagInput'+data_i"
+                          size="small"
+                          @keyup.enter.native="handleInputConfirm(data.options)"
+                          @blur="handleInputConfirm(data.options)"
+                      >
+                      </el-input>
+                      <el-button v-else class="button-new-tag" size="small" @click="addOption(data_i)">+ 新增选项值</el-button>
+                    </dd>
+                  </dl>
+                  <!--endregion 答题区域项 end-->
+                </div>
+              </el-collapse-item>
+            </template>
+          </el-collapse>
+        </div>
+        <!--endregion 答卷题目列表-->
+        <div>
+          <button class="btn-default" @click="addQuestion">+ 添加题目</button>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitQnr">保存</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/javascript" src="__ADMIN__/js/Question/qnrInfo.js?v={$V}"></script>

@@ -1,0 +1,153 @@
+<!--服务商管理-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="">
+    <p class="mb-26">
+      <a class="btn-default" style="width:99px;" @click="staffInfoLayer({})">+ 添加员工</a>
+    </p>
+    <div>
+      <table class="table-default action-b">
+        <thead>
+        <tr>
+          <th>登录账号</th>
+          <th>角色</th>
+          <th>上次登录ip</th>
+          <th>最后登录时间</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="employee in list">
+          <td>{{ employee.username }}</td>
+          <td>
+            <span>{{ employee.role_str }}</span>
+          </td>
+          <td>{{ employee.loginip}}</td>
+          <td>{{ employee.logintime }}</td>
+          <td class="table-action">
+            <a class="btn-action-edit1 a-title2" title="编辑" @click="staffInfoLayer(employee)"></a>
+            <a class="btn-action-del1 a-title2" v-if="employee.garden_admin == 0" title="删除"
+               @click="staffDel(employee)"></a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div id="page"></div>
+    </div>
+  </div>
+
+  <!--<script type="text/javascript" src="__ADMIN__/js/Rbac/staffList.js"></script>-->
+  <script>
+    (function (window) {
+      var AppUtil = window.AppUtil
+      var rootPath = window.ThinkPHP.APP
+      var publicObj = window.publicObj
+      var vm = new Vue({
+
+          el: '#app',
+
+          created: function () {
+            this.getList()
+          },
+
+          data: function () {
+            return {
+
+              /*内容*/
+              query: {
+                page: 1,
+                limit: 20,
+              },
+
+              list: [],
+              total: [],
+
+            }
+          },
+
+          computed: {},
+
+          methods: {
+
+            /*获取列表*/
+            getList: function (page, limit, callback) {
+              var self = this;
+              if (page) {
+                self.query.page = page;
+              }
+              if (limit) {
+                self.query.limit = limit;
+              }
+              self.query.action = 'query'
+              AppUtil.ajaxRequest({
+                url: rootPath + '/Rbac/index',
+                data: self.query,
+                type: 'post'
+              }).then(function (result) {
+                self.list = result.data.list
+                self.total = result.data.total
+                if (typeof callback === 'function') {
+                  callback()
+                }
+                //分页layui
+                layui.use(['laypage'], function () {
+                  var laypage = layui.laypage;
+                  laypage({
+                    cont: 'page'//ID，不加#
+                    , pages: Math.ceil(self.total / self.query.limit)
+                    , curr: self.query.page
+                    , skip: true
+                    , skin: '#707cd2'
+                    , jump: function (obj, first) {
+                      if (!first) {
+                        self.query.page = obj.curr;
+                        self.getList(obj.curr, self.query.limit);
+                      }
+                    }
+                  });
+                })
+
+              });
+            },
+
+            /*添加、编辑员工弹框*/
+            staffInfoLayer: function (employee) {
+              var self = this
+              var title = '添加'
+              if (employee.id > 0) {
+                title = '编辑'
+              }
+              publicObj.layerShow(2, title + '员工', rootPath + '/Index/staffInfo' + '&id=' + employee.id)
+            },
+
+            afterEditStaff: function () {
+              var self = this
+              self.getList()
+            },
+
+            /*删除员工*/
+            staffDel: function (admin) {
+              var self = this
+              layer.confirm('', {title: '确定删除该员工账号？', skin: 'layer-confirm'}, function (index) {
+                AppUtil.ajaxRequest({
+                  url: rootPath + '/Rbac/delUser',
+                  data: {
+                    id: admin.id
+                  }
+                }).then(function (result) {
+                  self.getList()
+                  publicObj.layerMsg(result.msg, AppUtil.SUCCESS);
+                }).catch(function (result) {
+
+                })
+              })
+            }
+
+          }
+        })
+      ;
+      window.vm = vm;
+    })(window);
+  </script>
+
+</block>

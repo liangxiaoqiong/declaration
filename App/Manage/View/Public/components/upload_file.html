@@ -1,0 +1,53 @@
+<!-- template -->
+<script type="x-template" id="upload_file_component">
+  <!--region 模版-->
+  <input type="file" v-upload-file="file" v-bind="$attrs"/>
+  <!--endregion-->
+</script>
+
+<!-- JS -->
+<script>
+  COMPONENT.UPLOAD_FILE_COMPONENT = {
+    template: '#upload_file_component',
+    // 使用该组件式 v-model="xxx" 这里统一命名xx为timeStr
+    model: {
+      prop: 'url',
+      event: 'change',
+    },
+    props: {
+      url: String,
+    },
+    computed: {},
+    // 指令中修改了数据后 这里进行监听 并触发input事件,通知父组件 完成v-model
+    watch: {
+      'file.url': function (newValue) {
+        this.$emit('change', newValue)
+      }
+    },
+    mounted: function () {
+    },
+    data: function () {
+      return {
+        file: {
+          url: this.url,
+        }
+      }
+    },
+    methods: {},
+    directives: {
+      uploadFile: {
+        inserted: function (el, binding) {
+          $(el).unbind('change')
+          $(el).change(function () {
+            AppUtil.upload({
+              el: el,
+              type: AppUtil.TYPE_ADV
+            }, function (result) {
+              binding.value.url = result.url;
+            });
+          })
+        }
+      }
+    }
+  }
+</script>

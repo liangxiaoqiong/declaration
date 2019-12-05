@@ -1,0 +1,107 @@
+<extend name="Public:base" />
+<block name="header_js">
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__DATA__/editor/ueditor/ueditor.all.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	var ue = UE.getEditor('inputContent',{
+		serverUrl :"{:U('Public/editorMethod')}"
+	});
+})
+</script>
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                {$vo.name}
+                <span class="tp-pos layui-breadcrumb">
+                  <if condition='ACTION_NAME eq "index"'>
+                  	<i class="layui-icon">&#xe63c;</i>
+                    <foreach name='poscate' item='v'>
+                    <a href="{:U('' . ucfirst($v['tablename']) .'/index', array('pid' => $v['id']))}">{$v.name}</a>
+                    </foreach>
+                  </if>
+                </span>  
+                </h3>
+                
+                <if condition="$subcate">
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <span class="navbar-text">子栏目：</span>
+                            <foreach name='subcate' item='v'>
+                                <a href="{:U(''. ucfirst($v['tablename']) . '/index', array('pid' => $v['id']))}" class="btn btn-sm btn-default navbar-btn">{$v.name}<notempty name="v['child']">&there4;</notempty></a>
+                            </foreach>
+                        </div>
+                    </div>
+                </nav>
+                </if>
+            </div>
+        </div>
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('index')}">
+                    
+            <div class="layui-form-item">
+                <label class="layui-form-label">摘要</label>
+                <div class="layui-input-inline" style="width:60%">
+                    <textarea name="description" class="layui-textarea">{$vo.description}</textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">内容</label>
+                <div class="layui-input-block">
+                    <textarea name="content" id="inputContent" style="height:370px; width:99%;">{$vo.content}</textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                    <input type="hidden" name="id" value="{$pid}" />
+					<input type="hidden" name="pid" value="{$pid}" />
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>保存 </button>
+                    </div>
+                 </div>
+             </div>
+         </form>
+    </div>
+    <script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	</script>
+</block>

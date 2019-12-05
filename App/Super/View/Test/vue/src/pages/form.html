@@ -1,0 +1,66 @@
+<!-- template -->
+<script type="x-template" id="form_page">
+  <!--region 模版-->
+  <div>
+    <diy-form :info="info" :single="single.name"></diy-form>
+  </div>
+  <!--endregion-->
+</script>
+
+<!-- JS -->
+<include file="Test/vue/src/components/form"/>
+<script>
+  var FORM_PAGE = {
+    template: '#form_page',
+    components: {
+      'diy-form': FORM_COMPONENT
+    },
+    props: {},
+    computed: {},
+    mounted: function () {
+      var self = this
+      setTimeout(function () {
+        self.info = {
+          name: '1232',
+          hobby: [1, 2],
+          sex: 2,
+          address: 2,
+          contacts: [
+            {
+              name: '妈妈2',
+              tel: '18717937995'
+            },
+            {
+              name: '哥哥2',
+              tel: '18717756663'
+            }
+          ]
+        }
+      }, 1000)
+    },
+    data: function () {
+      return {
+        info: {
+          name: '123',
+          hobby: [1, 2, 3],
+          sex: 1,
+          address: 1,
+          contacts: [
+            {
+              name: '妈妈',
+              tel: '18717937995'
+            },
+            {
+              name: '哥哥',
+              tel: '18717756663'
+            }
+          ]
+        },
+        single: {
+          name: 'hj'
+        }
+      }
+    },
+    methods: {}
+  }
+</script>

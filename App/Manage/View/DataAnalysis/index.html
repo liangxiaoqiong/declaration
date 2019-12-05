@@ -1,0 +1,85 @@
+<!--管理员：统计分析-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main super-index" id="app" v-cloak="">
+    <dl>
+      <dt>财务数据统计</dt>
+      <dd style="padding: 20px;">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>申报时间</label>
+              <datetime-range v-model="query.search_time" :time_range="query.search_time"></datetime-range>
+            </div>
+            <div class="search-list-item">
+              <label>对比时间</label>
+              <datetime-range v-model="query.search_time" :time_range="query.search_time"></datetime-range>
+            </div>
+            <div class="search-list-item">
+              <label>操作单位</label>
+              <el-select v-model="query.audit_status">
+                <el-option value="1">月</el-option>
+                <el-option value="2">季度</el-option>
+                <el-option value="3">年</el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="search-btn">
+            <button type="button" class="btn-default">导出表格</button>
+          </div>
+        </div>
+      </dd>
+    </dl>
+    <dl>
+      <dt>研发数据统计</dt>
+      <dd style="padding: 20px;">
+        <div class="table-search">
+          <div class="search-list">
+            <div class="search-list-item">
+              <label>时间</label>
+              <el-date-picker
+                  v-model="query.search_time2"
+                  type="date"
+                  value-format="yyyy-MM-DD"
+                  placeholder="请选择成立时间">
+              </el-date-picker>
+            </div>
+            <div class="search-list-item">
+              <label>操作单位</label>
+              <el-select v-model="query.audit_status">
+                <el-option value="">所有</el-option>
+                <el-option value="1">公司</el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="search-btn">
+            <button type="button" class="btn-default">导出表格</button>
+          </div>
+        </div>
+      </dd>
+    </dl>
+  </div>
+</block>
+<block name="footer_js">
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      components: {
+        'datetime-range': COMPONENT.DATETIME_RANGE
+      },
+      data: function () {
+        return {
+          loadComplete: false,
+          query: {
+            search_time: '',
+            search_time2: '',
+          },
+        }
+      },
+      mounted: function(){
+      },
+      methods: {
+      }
+    })
+  </script>
+</block>

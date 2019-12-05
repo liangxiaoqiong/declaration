@@ -1,0 +1,127 @@
+<!--操作日志列表-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak>
+    <div class="table-search">
+      <div class="search-list">
+        <div class="search-list-item">
+          <label>操作时间</label>
+          <datetime-range v-model="query.search_time" :time_range="query.search_time"></datetime-range>
+        </div>
+        <div class="search-list-item">
+          <label>操作者</label>
+          <el-input v-model="query.name" placeholder="输入操作者账号"></el-input>
+        </div>
+      </div>
+      <div class="search-btn">
+        <button type="button" class="btn-default" @click="getTableData({page: 1, limit: query.limit})">搜索</button>
+        <button type="button" class="btn-default" @click="resetSearch">清空</button>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th width="10%">编号</th>
+          <th width="15%">操作者</th>
+          <th width="15%">操作时间</th>
+          <th width="15%">IP地址</th>
+          <th width="30%" style="text-align: left;padding-left:5%;">操作记录</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="log in tableData.list">
+          <td width="10%">{{ log.log_id }}</td>
+          <td width="15%">{{ log.admin_name }}</td>
+          <td width="15%">{{ log.create_time }}</td>
+          <td width="15%">{{ log.ip }}</td>
+          <td width="30%" style="text-align: left;padding-left:5%;">{{ log.desc }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+    </div>
+  </div>
+
+
+</block>
+<block name="footer_js">
+  <script>
+    (function (window) {
+      var AppUtil = window.AppUtil
+      var rootPath = window.ThinkPHP.APP
+      var vm = new Vue({
+          el: '#app',
+        components: {
+          'pagination': COMPONENT.PAGINATION,
+          'datetime-range': COMPONENT.DATETIME_RANGE,
+        },
+          created: function () {
+            this.getTableData()
+          },
+          data: function () {
+            return {
+              /*内容*/
+              query: {
+                page: 1,
+                limit: 20,
+                name: '',
+                time_min: '',
+                time_max: '',
+                search_time: ''
+              },
+              tableData: {},
+            }
+          },
+          watch: {
+            'query.search_time': function (val) {
+              var self = this;
+              if (val !== '') {
+                self.query.time_min = val[0];
+                self.query.time_max = val[1];
+              } else {
+                self.query.time_min = '';
+                self.query.time_max = '';
+              }
+            }
+          },
+          computed: {},
+          methods: {
+            /*重置查询条件*/
+            resetSearch: function () {
+              var query = {
+                page: 1,
+                limit: 20,
+                name: '',
+                time_min: '',
+                time_max: '',
+                search_time: ''
+              }
+              this.query = query;
+            },
+            /*获取列表*/
+            getTableData: function (current) {
+              var self = this;
+              if (typeof current !== 'undefined') {
+                if (typeof current.page !== 'undefined') {
+                  self.query.page = current.page;
+                }
+                if (typeof current.limit !== 'undefined') {
+                  self.query.limit = current.limit;
+                }
+              }
+              AppUtil.ajaxRequest({
+                url: rootPath + '/System/logList',
+                data: self.query,
+                type: 'post'
+              }).then(function (result) {
+                self.tableData = result.data
+              });
+            },
+          }
+        })
+      ;
+      window.vm = vm;
+    })(window);
+  </script>
+</block>

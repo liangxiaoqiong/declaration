@@ -1,0 +1,127 @@
+<extend name="Public:base" />
+<block name="header_js">
+</block>
+
+<block name="content">
+<!--tab标签-->
+<div class="layui-tab layui-tab-brief">
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+            <form method="post" id="form_do" class="layui-form form-container" data-url="{:U('site')}">
+                
+                <div class="layui-tab">
+                    <ul class="layui-tab-title">
+                    	<foreach name='configgroup' item='v'>
+                        <li <if condition="$key eq 1">class="layui-this"</if>>{$v}</li>
+                        </foreach>
+                    </ul>
+                    <div class="layui-tab-content">
+                        <foreach name='vlist' item='v'>
+                        <div class="layui-tab-item <if condition="$key eq 1">layui-show</if>">
+                        	<foreach name='v' item='config'>
+                            <if condition="$config['typeid'] eq 5">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">{$config.title}</label>
+                                <div class="layui-input-inline" style="width:30%;">
+                                    <input type="text" name="config[{$config['name']}]" value="{$config['value']}" placeholder="{$config.title}" class="layui-input" id="litpic{$key}">
+                                </div>
+                                {:get_element_nhtml("config[".$config['name']."]",$config['typeid'], $config['tvalue'], $config['value'],$key)}
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label"></label>
+                                <div class="layui-input-inline" style="width:30%;">
+                                    <div id="litpic_show{$key}"><if condition="$config['value']"><img src="{$config['value']}" width="100%" /></if></div>
+                                </div>
+                            </div>
+                            <script>
+							layui.use(['upload','layer'],function(){
+								var form = layui.form()
+								,jq = layui.jquery;
+							  
+							  //上传图片
+							  layui.upload({
+								url: "{:U('Public/upload',array('img_flag' => 1))}"
+								,elem:'#image{$key}'
+								,before: function(input){
+								  loading = layer.load(2, {
+									shade: [0.2,'#000']
+								  });
+								}
+								,success: function(res){
+									var img = res.info[0].url;//原图
+									var timg = res.info[0].turl;//缩略图
+									layer.close(loading);
+									jq('#litpic{$key}').val(img);
+									jq('#litpic_show{$key}').html("<img src='"+timg+"' width='100%'>");
+									layer.msg('上传成功！', {icon: 1, time: 1000});
+								}
+							  });
+							
+							});
+							</script>
+                            <else />
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">{$config.title}</label>
+                                <div class="layui-input-inline" style="width:50%;">
+                                    {:get_element_nhtml("config[".$config['name']."]",$config['typeid'], $config['tvalue'], $config['value'],$key)}
+                                </div>
+                            </div>
+                            </if>
+                            <if condition="$config['remark']">
+                            <div class="layui-form-item">
+								<label class="layui-form-label"></label>
+								<div class="layui-input-block">
+									{$config.remark}							
+								</div>
+							</div>
+                            </if>
+                            </foreach>
+                        </div>
+                        </foreach>
+                    </div>
+                </div>
+                <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                        <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>保 存</button>
+                    </div>
+                </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+</div>
+<!--<script type="text/javascript" src="__ADMIN__/js/formadd.js"></script>-->
+<script>
+	layui.use(['layer','element'],function(){
+		// var form = layui.form()
+		var jq = layui.jquery
+		,element = layui.element();
+	  
+	  //提交表单
+	  var url=jq('form').data('url');
+	  /*form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });*/
+	
+	});
+</script>
+</block>

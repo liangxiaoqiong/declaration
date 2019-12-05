@@ -1,0 +1,38 @@
+<!--管理员首页-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main super-index">
+    <dl>
+      <dt>企业认证数据</dt>
+      <dd>
+        <a class="bg-color__1">
+          <h4>{$meta['company_apply_meta']['audit_status_0']}</h4>
+          <p>未审核数量</p>
+        </a>
+        <a class="bg-color__2">
+          <h4>{$meta['company_apply_meta']['audit_status_1']}</h4>
+          <p>已通过数量</p></a>
+        <a class="bg-color__3">
+          <h4>{$meta['company_apply_meta']['audit_status_2']}</h4>
+          <p>未通过数量</p></a>
+        <a class="bg-color__4">
+          <h4>{$meta['company_apply_meta']['auth_status_1']}</h4>
+          <p>认证总数量</p></a>
+      </dd>
+    </dl>
+    <dl>
+      <dt>企业申报数据</dt>
+      <dd>
+        <a class="bg-color__1">
+          <h4>{$meta['data_apply_meta']['audit_status_0']}</h4>
+          <p>未审核数量</p></a>
+        <a class="bg-color__2">
+          <h4>{$meta['data_apply_meta']['audit_status_1']}</h4>
+          <p>已审核数量</p></a>
+        <a class="bg-color__3">
+          <h4>{$meta['data_apply_meta']['audit_status_2']}</h4>
+          <p>未通过数量</p></a>
+      </dd>
+    </dl>
+  </div>
+</block>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+	<title><{$config.site_name}></title>
+	<description><{$config.seo_description}></description>
+	<link><{$config.site_url}></link>
+	<lastBuildDate><{$_SERVER.REQUEST_TIME|date='r',###}></lastBuildDate>
+	<ttl>720</ttl>
+	<image>
+		<url><{$config.site_logo}></url>
+		<title><{$config.site_name}></title>
+		<link><{$config.site_url}></link>
+		<description><{$config.seo_description}></description>
+	</image>
+	<volist name="article" id="vo">
+		<item>
+			<title><![CDATA[<{$vo.title|htmlspecialchars_decode=###}>]]></title>
+			<if condition="$config['site_html']">
+				<link><{$config.site_url}>/article/<{$vo.id}></link>
+			<else/>
+				<link><{$config.site_url}>/index.php?m=article&a=index&id=<{$vo.id}></link>
+			</if>
+			<description><![CDATA[<{$vo.content}><if condition="$vo['pic_url']"><br/><img src="<{$vo.pic_url}>"/></if>]]></description>
+			<if condition="$config['site_html']">
+				<comments><{$config.site_url}>/article/<{$vo.id}>#comments_<{$vo.id}></comments>
+			<else/>
+				<comments><{$config.site_url}>/index.php?m=article&a=index&id=<{$vo.id}>#comments_<{$vo.id}></comments>
+			</if>
+			<pubDate><{$vo.time|date='Y-m-d H:i:s',###}></pubDate>
+		</item>
+	</volist>
+</channel>
+</rss>

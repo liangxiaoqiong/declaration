@@ -1,0 +1,89 @@
+<!--数据填报(数据申报)列表-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="table-search">
+      <div class="search-list">
+        <div class="search-list-item">
+          <label>审核结果</label>
+          <el-select v-model="query.audit_status">
+            <el-option value="" label="全部"></el-option>
+            <el-option value="1" label="待审核"></el-option>
+            <el-option value="2" label="已审核"></el-option>
+            <el-option value="3" label="审核失败"></el-option>
+          </el-select>
+        </div>
+        <div class="search-list-item">
+          <label>申报时间</label>
+          <el-date-picker
+              v-model="query.min_apply_time"
+              type="month"
+              value-format="yyyy-MM"
+              placeholder="请选择开始年份">
+          </el-date-picker>
+        </div>
+        <div class="search-list-item">
+          <el-date-picker
+              v-model="query.max_apply_time"
+              type="month"
+              value-format="yyyy-MM"
+              placeholder="请选择结束年份">
+          </el-date-picker>
+        </div>
+        <div class="search-list-item">
+          <label>公司名称</label>
+          <el-input v-model="query.company_name" placeholder="请输入公司名称"></el-input>
+        </div>
+      </div>
+      <div class="search-btn">
+        <button type="button" class="btn-default" @click="getTableData({page: 1, limit: 1})">搜索</button>
+        <button type="button" class="btn-default" @click="exportMyApplyList">导出</button>
+      </div>
+      <div class="search-btn-other">
+        <a class="btn-default" style="width: 127px;" @click="myApplyAction('add')">+ 新增数据申报</a>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th>申报时间</th>
+          <th>审核结果</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-if="+tableData.total > 0">
+          <tr v-for="data in tableData.list">
+            <td>{{ data.apply_time | formatMouth }}</td>
+            <td>{{ +data.audit_status === 0 ? '待审核' : (+data.audit_status === 1 ? '通过' : '未通过') }}</td>
+            <td>{{ data.create_time | formatDate }}</td>
+            <td>
+              <a class="layui-btn layui-btn-primary layui-btn-xs" @click="myApplyAction('view', data)">查看</a>
+              <a class="layui-btn layui-btn-normal layui-btn-xs" @click="myApplyAction('edit', data)">编辑</a>
+            </td>
+          </tr>
+        </template>
+        <template v-else>
+          <tr><td colspan="4" class="table-null">暂无申报数据</td></tr>
+        </template>
+        </tbody>
+      </table>
+      <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+    </div>
+
+    <template v-if="temp.myApplyDialog.showDialog && temp.myApplyDialog.dialogType === 'view'">
+      <my-apply-info :my-apply-data="temp.myApplyDialog"></my-apply-info>
+    </template>
+    <template :my-apply-data="temp.myApplyDialog"
+              v-if="temp.myApplyDialog.showDialog && (temp.myApplyDialog.dialogType === 'edit' || temp.myApplyDialog.dialogType === 'add')">
+      <my-apply-modify :my-apply-data="temp.myApplyDialog" @page-event="getTableData"></my-apply-modify>
+    </template>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Company/dataApplyInfo"/>
+  <include file="Company/dataApplyModify"/>
+  <script type="text/javascript" src="__ADMIN__/js/Company/dataApply.js?v={$V}"></script>
+</block>

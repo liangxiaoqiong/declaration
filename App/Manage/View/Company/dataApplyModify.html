@@ -1,0 +1,130 @@
+<!--新增||编辑-数据填报-->
+<script type="x-template" id="my_apply_modify">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>数据填报</h3><a @click="myApplyData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar data-report-info">
+        <!--region 添加||编辑 start-->
+        <el-form :model="myApplyData.dialogData" ref="dataReportForm" label-width="120px" class="form-default">
+          <el-form-item class="declaration-time"
+                        label="申报时间" prop="apply_time">
+            <span>{{myApplyData.dialogData.apply_time | formatMouth}}</span>
+          </el-form-item>
+          <div class="form-card">
+            <h4>财务数据申报</h4>
+            <div>
+              <el-form-item label="营业收入产值(万元)" prop="income_output_value"
+                            :rules="[{ required: true, message: '请输入营业收入产值(万元)' }]">
+                <el-input placeholder="请输入营业收入产值(万元)" v-model="myApplyData.dialogData.income_output_value"></el-input>
+              </el-form-item>
+              <el-form-item label="出口额总值(万元)" prop="export_value"
+                            :rules="[{ required: true, message: '请输入出口额总值(万元)' }]">
+                <el-input placeholder="请输入出口额总值(万元)" v-model="myApplyData.dialogData.export_value"></el-input>
+              </el-form-item>
+              <el-form-item label="投资额总价(万元)" prop="investment_value"
+                            :rules="[{ required: true, message: '请输入投资额总价(万元)' }]">
+                <el-input placeholder="请输入投资额总价(万元)" v-model="myApplyData.dialogData.investment_value"></el-input>
+              </el-form-item>
+              <el-form-item label="利润总额(万元)" prop="profit_value"
+                            :rules="[{ required: true, message: '请输入利润总额(万元)' }]">
+                <el-input placeholder="请输入利润总额(万元)" v-model="myApplyData.dialogData.profit_value"></el-input>
+              </el-form-item>
+              <el-form-item label="纳税总额(万元)" prop="taxes_value"
+                            :rules="[{ required: true, message: '请输入纳税总额(万元)' }]">
+                <el-input placeholder="请输入纳税总额(万元)" v-model="myApplyData.dialogData.taxes_value"></el-input>
+              </el-form-item>
+            </div>
+          </div>
+          <div class="form-card">
+            <h4>研发情况申报<em>（请填跟本月新增的已获得授权的专利个数）</em></h4>
+            <div>
+              <el-form-item label="本月研发人员数" prop="dev_people_value">
+                <el-input v-model="myApplyData.dialogData.dev_people_value"></el-input>
+              </el-form-item>
+              <el-form-item label="发明专利" prop="invention_patent_value">
+                <el-input v-model="myApplyData.dialogData.invention_patent_value"></el-input>
+              </el-form-item>
+              <el-form-item label="实用新型专利" prop="utility_patent_value">
+                <el-input v-model="myApplyData.dialogData.utility_patent_value"></el-input>
+              </el-form-item>
+              <el-form-item label="外观设计专利" prop="facade_patent_value">
+                <el-input v-model="myApplyData.dialogData.facade_patent_value"></el-input>
+              </el-form-item>
+              <el-form-item label="软件著作权" prop="software_copyright_value">
+                <el-input v-model="myApplyData.dialogData.software_copyright_value"></el-input>
+              </el-form-item>
+              <el-form-item label="其他" prop="other_value">
+                <el-input v-model="myApplyData.dialogData.other_value"></el-input>
+              </el-form-item>
+            </div>
+          </div>
+        </el-form>
+        <!--endregion 添加||编辑 end-->
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitForm('dataReportForm')">提交</a>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.MY_APPLY_MODIFY = {
+    template: '#my_apply_modify',
+    components:{},
+    props: {
+      myApplyData: {}
+    },
+    data: function () {
+      return {}
+    },
+    filters: {
+      /**时间过滤器*/
+      formatMouth: function (value) {
+        return publicObj.dateTime_Str(new Date(+value * 1000), 'mouth');
+      }
+    },
+    methods: {
+      //提交||新增/修改数据申报
+      submitForm:function(formName) {
+        var self = this;
+        self.$refs[formName].validate(function (valid) {
+          if (valid) {
+            if(self.myApplyData.dialogData.data_id && self.myApplyData.dialogData.data_id !== ''){
+              self.saveDataApply();
+            }else{
+              self.addDataApply();
+            }
+          } else {
+            return false;
+          }
+        });
+      },
+      //新增数据申报
+      addDataApply: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url:  APP + '/addDataApply',
+          data: JSON.stringify(self.myApplyData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('保存成功', {icon: 1, time: 1000});
+          self.myApplyData.showDialog = false;
+          self.$emit('page-event');
+        })
+      },
+      //修改数据申报
+      saveDataApply: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/saveDataApply',
+          data: JSON.stringify(self.myApplyData.dialogData),
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        }).then(function (result) {
+          layer.msg('修改成功', {icon: 1, time: 1000});
+          self.myApplyData.showDialog = false;
+          self.$emit('page-event');
+        })
+      }
+    }
+  }
+</script>

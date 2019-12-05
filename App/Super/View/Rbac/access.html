@@ -1,0 +1,129 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script>
+layui.use(['form'],function(){
+  var form = layui.form()
+  ,jq = layui.jquery;
+  
+ form.on('checkbox(level1)', function(data){
+	var checked = data.elem.checked;
+	var inputs = jq(this).parents('.panel').find('.panel-body input');     
+	if (checked) {
+		inputs.prop('checked', true);
+	}else {
+		inputs.prop('checked', false);
+	}
+    form.render('checkbox');
+  });
+ 	
+  form.on('checkbox(level2)', function(data){
+	var checked = data.elem.checked;
+	var parent = jq(this).parents('.panel:eq(0)'); 
+	var topParent = parent.parents('.panel:eq(0)');    
+	if (checked) {
+		parent.find('.panel-body input').prop('checked', true);
+		topParent.find('input[level=1]').prop('checked', true);
+	}else {
+		parent.find('.panel-body input').prop('checked', false);
+		topParent.find('input[level=1]').prop('checked', false);
+	}
+    form.render('checkbox');
+  });
+  
+ form.on('checkbox(level3)', function(data){
+	var checked = data.elem.checked;
+	var parent = jq(this).parents('.panel:eq(0)');
+	var topParent = parent.parents('.panel:eq(0)');  
+	if (checked) {
+		parent.find('.panel-heading input').prop('checked', true);
+		topParent.find('input[level=1]').prop('checked', true);
+	}
+    form.render('checkbox');
+  });
+
+})
+
+$(function () {
+	//更新权限
+	$('#update').click(function () {
+		$.post("{:U('access')}", $('#formAccess').serialize(),
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+});
+</script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                    {$type} 
+                    </h3>
+                </div>
+            </div>
+        	
+            <div class="layui-box-searchber">
+            	<button class="layui-btn layui-btn-small" onclick="history.go(-1);"><i class="layui-icon">&#xe603;</i> 返回</button>
+                <button class="layui-btn layui-btn-small layui-btn-normal" id="update"><i class="layui-icon">&#x1002;</i> 更新权限</button>
+            </div>
+        	<hr>
+            <div class="row">
+                <div class="col-lg-12">
+                    <form method="post" action="" id="formAccess">
+                    <input type="hidden" name="rid" value="{$rid}"/>
+                    <volist name="node" id="vo">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <div class="row">
+                                        <div class="col-xs-8">
+                                            <h3 class="panel-title" id="level1">
+                                            <input type="checkbox" name="access[]" value="{$vo.id}_{$vo.level}" level="1" <if condition="$vo['access']">checked="checked"</if> title="{$vo.title}" lay-skin="primary" lay-filter="level1" /> </h3>
+                                        </div>
+                                </div>
+                                
+                            </div>
+                            <div class="panel-body tp-panel-body">
+                                    <volist name="vo['child']" id="vo2">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <div class="row">
+                                                        <div class="col-xs-8">
+                                                            <h3 class="panel-title">
+                                                            <input type="checkbox" name="access[]" value="{$vo2.id}_{$vo2.level}" level="2" <if condition="$vo2['access']">checked="checked"</if> title="{$vo2.title}" lay-skin="primary" lay-filter="level2" /> </h3>
+                                                        </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="panel-body">
+                                                    <volist name="vo2['child']" id="vo3"> 
+                                                            <input type="checkbox" name="access[]" value="{$vo3.id}_{$vo3.level}" level="3" <if condition="$vo3['access']">checked="checked"</if> title="{$vo3.title}" lay-skin="primary" lay-filter="level3" /> &nbsp;&nbsp;
+                                                    </volist>
+                                            </div>
+                                        </div>                                
+                                    </volist>
+                            </div>
+                        </div>
+                    
+                    </volist>
+                    </form>
+                </div>
+    		</div>
+		</div>	
+        
+	</div>
+    
+</block>

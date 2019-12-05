@@ -1,0 +1,118 @@
+<!--数据申报操作-->
+<script type="x-template" id="apply_info">
+  <div class="dialog-default">
+    <div class="dialog-body">
+      <div class="dialog-head"><h3>数据申报操作</h3><a @click="applyData.showDialog = false"></a></div>
+      <div class="dialog-main custom-scrollbar declare-info">
+        <i :class="'audit-status__'+applyData.dialogData.audit_status"></i>
+        <div class="data-info">
+          <dl>
+            <dd>
+              <div><span>公司名称:{{ applyData.dialogData.company_name }}</span></div>
+              <div>
+                <span>申报时间:{{ applyData.dialogData.apply_time | formatDate }}</span>
+                <span>创建时间:{{ applyData.dialogData.create_time | formatDate }}</span>
+              </div>
+            </dd>
+          </dl>
+          <dl>
+            <dt>财务数据申报</dt>
+            <dd>
+              <div>
+                <span>营业收入产值(万元):{{ applyData.dialogData.income_output_value }}</span>
+                <span>出口额总值(万元):{{ applyData.dialogData.export_value }}</span>
+              </div>
+              <div>
+                <span>投资额总价(万元):{{ applyData.dialogData.investment_value }}</span>
+                <span>利润总额(万元):{{ applyData.dialogData.profit_value }}</span>
+              </div>
+              <div><span>纳税总额(万元):{{ applyData.dialogData.taxes_value }}</span></div>
+            </dd>
+          </dl>
+          <dl>
+            <dt>研发情况申报</dt>
+            <dd>
+              <div>
+                <span>本月研发人员数:{{ applyData.dialogData.dev_people_value }}</span>
+                <span>发明专利:{{ applyData.dialogData.invention_patent_value }}</span>
+              </div>
+              <div>
+                <span>实用新型专利:{{ applyData.dialogData.utility_patent_value }}</span>
+                <span>外观设计专利:{{ applyData.dialogData.facade_patent_value }}</span>
+              </div>
+              <div>
+                <span>软件著作权:{{ applyData.dialogData.software_copyright_value }}</span>
+                <span>其他:{{ applyData.dialogData.other_value }}</span>
+              </div>
+              <div v-if="+applyData.dialogData.audit_status === 2">
+                <label><span>拒绝原因：</span><font>{{ applyData.dialogData.audit_reason }}</font></label>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <template v-if="+applyData.dialogData.audit_status === 0">
+          <a @click="dataApplyPass">通过</a>
+          <a @click="dataApplyRefuse" class="btn-red">拒绝</a>
+        </template>
+        <template v-else>
+          <a @click="applyData.showDialog = false">确定</a>
+        </template>
+      </div>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.APPLY_INFO = {
+    template: '#apply_info',
+    components:{},
+    props: {
+      applyData: Object
+    },
+    data: function () {
+      return {}
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.formatDate(new Date(value * 1000));
+      }
+    },
+    methods: {
+      //审核通过
+      dataApplyPass: function () {
+        var self = this;
+        AppUtil.ajaxRequest({
+          url: APP + '/passOldDataApply',
+          data: {data_id: self.applyData.dialogData.data_id},
+        }).then(function (result) {
+          self.applyData.dialogData.audit_status = 1;
+          self.$emit('page-event');
+          layer.msg('已审核通过', {icon: 1, time: 1000});
+        })
+      },
+      //审核拒绝
+      dataApplyRefuse: function () {
+        var self = this;
+        layer.prompt({
+          formType: 2,
+          value: '',
+          title: '请输入拒绝原因',
+          area: ['400px', '200px']
+        }, function(value, index, elem){
+          AppUtil.ajaxRequest({
+            url: APP + '/refuseOldDataApply',
+            data: {data_id: self.applyData.dialogData.data_id, audit_reason: value},
+          }).then(function (result) {
+            self.applyData.dialogData.audit_status = 2;
+            self.applyData.dialogData.audit_reason = value;
+            self.$emit('page-event');
+            layer.msg('审核已拒绝', {icon: 1, time: 1000});
+            layer.close(index);
+          })
+        });
+      }
+    }
+  }
+</script>

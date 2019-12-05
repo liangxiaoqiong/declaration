@@ -1,0 +1,56 @@
+<script type="x-template" id="art_list_components">
+  <div>
+    <div class="info-title news-title">
+      <h1>{{ childNav.nav_name }}</h1>
+      <p>{:get_cfg_value('CFG_OFFICIAL_TITLE')}　|　网址：{:get_cfg_value('CFG_WEBURL')}</p>
+    </div>
+    <!--分页-->
+    <div class="list-news">
+      <template v-for="list in artListData.list">
+        <a class="news" @click="linkArtInfo(list)">
+          <span>{{ list.article_title }}</span><font>[{{ list.create_time | formatDate }}]</font>
+        </a>
+      </template>
+    </div>
+    <!--分页-->
+    <div class="list-page">
+      <el-pagination
+          background
+          :current-page="page"
+          :page-size="limit"
+          layout="total, prev, pager, next"
+          :total="+artListData.total"
+          @current-change="pageChange">
+      </el-pagination>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.ART_LIST_COMPONENTS = {
+    template: '#art_list_components',
+    props: {
+      page: Number,
+      limit: Number,
+      childNav: Object,
+      artListData: Object
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.dateTime_Str(new Date(value * 1000), 'date');
+      }
+    },
+    data: function () {
+      return {}
+    },
+    methods: {
+      pageChange: function (page) {
+        this.$emit('page-event',page);//调用父组件方法，并传参
+      },
+      //文章列表||会员列表跳转
+      linkArtInfo: function (list) {
+        router.push({ path: 'art-info', query: { aid: list.article_id}})
+      },
+    }
+  }
+</script>

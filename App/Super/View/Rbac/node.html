@@ -1,0 +1,144 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script>
+layui.use(['form'],function(){
+  var form = layui.form()
+  ,jq = layui.jquery;
+  
+ form.on('checkbox(level1)', function(data){
+	var checked = data.elem.checked;
+	var inputs = jq(this).parents('.panel').find('.panel-body input');     
+	if (checked) {
+		inputs.prop('checked', true);
+	}else {
+		inputs.prop('checked', false);
+	}
+    form.render('checkbox');
+  });
+ 	
+  form.on('checkbox(level2)', function(data){
+	var checked = data.elem.checked;
+	var parent = jq(this).parents('.panel:eq(0)'); 
+	var topParent = parent.parents('.panel:eq(0)');    
+	if (checked) {
+		parent.find('.panel-body input').prop('checked', true);
+		topParent.find('input[level=1]').prop('checked', true);
+	}else {
+		parent.find('.panel-body input').prop('checked', false);
+		topParent.find('input[level=1]').prop('checked', false);
+	}
+    form.render('checkbox');
+  });
+  
+ form.on('checkbox(level3)', function(data){
+	var checked = data.elem.checked;
+	var parent = jq(this).parents('.panel:eq(0)');
+	var topParent = parent.parents('.panel:eq(0)');  
+	if (checked) {
+		parent.find('.panel-heading input').prop('checked', true);
+		topParent.find('input[level=1]').prop('checked', true);
+	}
+    form.render('checkbox');
+  });
+
+})
+
+$(function () {
+	//更新权限
+	$('#update').click(function () {
+		$.post("{:U('access')}", $('#formAccess').serialize(),
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+});
+</script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                    {$type} 
+                    </h3>
+                </div>
+            </div>
+        	
+            <div class="layui-box-searchber">
+            	<button class="layui-btn layui-btn-small" onclick="goUrl('{:U('addNode', array('level' => 1))}')"><i class="layui-icon">&#xe608;</i> 添加应用(节点)</button>
+            </div>
+            <div style="margin-top:10px;">
+                <blockquote class="layui-elem-quote layui-quote-nm"><i class="layui-icon">&#xe60b;</i> 节点：应用(level:1)->控制器(level:2)->方法(level:3)</blockquote>
+            </div>
+        	<hr>
+            <div class="row">
+                <div class="col-lg-12">
+                    <volist name="node" id="vo">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <div class="row">
+                                        <div class="col-xs-8">
+                                            <h3 class="panel-title">{$vo.title}</h3>
+                                        </div>
+                                        <div class="col-xs-4 text-right">
+                                            <a href="{:U('addNode', array('pid' => $vo['id'],'level' => 2))}" class="btn btn-xs btn-primary" title="添加"><i class="glyphicon glyphicon-plus-sign"></i> </a>      
+                                            <a href="{:U('editNode', array('id' => $vo['id']))}" class="btn btn-xs btn-success" title="修改"><i class="glyphicon glyphicon-edit"></i></a>
+                                            <empty name="vo['child']">
+                                            <button type="button" onclick="del('{:U('delNode', array('id' => $vo['id']))}')" class="btn btn-xs btn-danger" title="删除"><i class="glyphicon glyphicon-remove"></i></button>
+                                            </empty>
+                                        </div>
+                                </div>
+                                
+                            </div>
+                            <div class="panel-body xyh-panel-body">
+                                    <volist name="vo['child']" id="vo2">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <div class="row">
+                                                        <div class="col-xs-8">
+                                                            <h3 class="panel-title">{$vo2.title}</h3>
+                                                        </div>
+                                                        <div class="col-xs-4 text-right">
+                                                            <a href="{:U('addNode', array('pid' => $vo2['id'],'level' => 3))}" class="btn btn-xs btn-primary" title="添加"><i class="glyphicon glyphicon-plus-sign"></i> </a>      
+                                                            <a href="{:U('editNode', array('id' => $vo2['id']))}" class="btn btn-xs btn-success" title="修改"><i class="glyphicon glyphicon-edit"></i></a>
+                                                            <empty name="vo2['child']">
+                                                            <button type="button" onclick="del('{:U('delNode', array('id' => $vo2['id']))}')" class="btn btn-xs btn-danger" title="删除"><i class="glyphicon glyphicon-remove"></i></button>
+                                                            </empty>
+                                                        </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="panel-body">
+                                                    <volist name="vo2['child']" id="vo3"> 
+                                                        <div class="col-md-3 column">                   
+                                                        <span class="label <notempty name='vo3["status"]'>label-primary<else />label-default</notempty>">{$vo3.title}</span> 
+                                                        <a href="{:U('editNode', array('id' => $vo3['id']))}" class="label label-success"><i class="glyphicon glyphicon-edit"></i></a> 
+                                                        <a href="javascript:;" onclick="del('{:U('delNode', array('id' => $vo3['id']))}')"  class="label label-danger"><i class="glyphicon glyphicon-remove"></i></a>&nbsp; 
+                                                        </div>
+                                                    </volist>
+                                            </div>
+                                        </div>                                
+                                    </volist>
+                            </div>
+                        </div>
+                    
+                    </volist>
+                </div>
+            </div>
+		</div>	
+        
+	</div>
+    
+</block>

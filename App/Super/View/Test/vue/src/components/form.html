@@ -1,0 +1,62 @@
+<!-- template -->
+<script type="x-template" id="form_component">
+  <!--region 模版-->
+  <div>
+    <div>
+      姓名：<input type="text" v-model="info.name">
+    </div>
+    <div>
+      <label>篮球<input type="checkbox" value="1" v-model="info.hobby"></label>
+      <label>足球<input type="checkbox" value="2" v-model="info.hobby"></label>
+      <label>羽毛球<input type="checkbox" value="3" v-model="info.hobby"></label>
+    </div>
+    <div>
+      <label>男<input type="radio" value="1" v-model="info.sex"></label>
+      <label>女<input type="radio" value="2" v-model="info.sex"></label>
+    </div>
+    <div>
+      地址：
+      <select v-model="info.address">
+        <option value="1">厦门</option>
+        <option value="2">泉州</option>
+        <option value="3">福州</option>
+      </select>
+    </div>
+    <div>
+      联系人：
+      <ul>
+        <li v-for="people in info.contacts">
+          <label>姓名：<input type="text" v-model="people.name"></label>
+          <label>电话：<input type="text" v-model="people.tel"></label>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <span>{{ single }}</span>
+      <button @click="updateSingle">修改单父组件传递的数据</button>
+    </div>
+  </div>
+  <!--endregion-->
+</script>
+
+<!-- JS -->
+<script>
+  var FORM_COMPONENT = {
+    template: '#form_component',
+    props: {
+      info: Object,
+      single: String
+    },
+    computed: {},
+    mounted: function () {
+    },
+    data: function () {
+      return {}
+    },
+    methods: {
+      updateSingle: function () {
+        this.single = '1234'
+      }
+    }
+  }
+</script>

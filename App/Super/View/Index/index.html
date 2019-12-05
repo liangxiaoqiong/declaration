@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>后台管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="stylesheet" href="__ADMIN__/plugins/layui/css/layui.css" media="all"/>
+  <link rel="stylesheet" href="__ADMIN__/plugins/font-awesome/css/font-awesome.min.css"/>
+  <link rel="stylesheet" href="__ADMIN__/css/layout.css?v={$V}" media="all"/>
+  <link rel="stylesheet" href="__ADMIN__/css/global.css?v={$V}" media="all"/>
+  <link rel="stylesheet" href="__ADMIN__/css/admin.css?v={$V}" media="all"/>
+
+</head>
+
+<body>
+<div class="layui-layout layui-layout-admin beg-layout-container">
+  <div class="layui-header beg-layout-header">
+    <div class="beg-layout-main beg-layout-logo">
+      <img src="__ADMIN__/images/common/admin_logo.png"><span class="line-one"></span>
+    </div>
+    <div class="beg-layout-main beg-layout-side-toggle">
+      <i class="fa fa-bars" aria-hidden="true"></i>
+    </div>
+    <!--一级菜单-->
+    <div class="beg-layout-main beg-layout-menu" id="menu">
+      <ul class="layui-nav beg-layout-nav" lay-filter="">
+        <foreach name='menu' key='k' item='v'>
+          <li class="layui-nav-item <empty name='k'>layui-this</empty>">
+            <a href="javascript:;" data-key="{$k}" data-module-id="{$v.id}"
+               data-url="{:U('Index/getMenu?pid='.$v['id'])}">
+              <i class="fa {$v.icon}" aria-hidden="true"></i>
+              <cite>{$v.name}</cite>
+            </a>
+          </li>
+        </foreach>
+
+      </ul>
+    </div>
+    <div class="beg-layout-main beg-layout-panel">
+      <ul class="layui-nav beg-layout-nav" lay-filter="user">
+        <li class="layui-nav-item">
+          <a class="update_cache" href="javascript:void(0)">清除缓存</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="{:C('CFG_WEBURL')}" target="_blank">浏览网站</a>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;" class="beg-layou-head">
+            <img src="__ADMIN__/images/default.png"/>
+            <span>{$ADMIN['username']}</span>
+          </a>
+          <dl class="layui-nav-child">
+            <!--<dd>-->
+            <!--<a href="javascript:;" data-tab="true" data-url="{:U('Personal/index')}">-->
+            <!--<i class="fa fa-user-circle" aria-hidden="true"></i>-->
+            <!--<cite>个人信息</cite>-->
+            <!--</a>-->
+            <!--</dd>-->
+            <dd>
+              <a href="javascript:;" data-tab="true" data-url="{:U('Personal/pwd')}">
+                <i class="fa fa-gear" aria-hidden="true"></i>
+                <cite>修改密码</cite>
+              </a>
+            </dd>
+            <dd>
+              <a href="{:U('Login/logout')}">
+                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                <cite>注销</cite>
+              </a>
+            </dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!--侧边导航栏-->
+  <div class="layui-side beg-layout-side" id="side" lay-filter="side"></div>
+  <!--内容区域-->
+  <div class="layui-body beg-layout-body">
+    <div class="layui-tab layui-tab-brief layout-nav-card" lay-filter="layout-tab"
+         style="border: 0; margin: 0;box-shadow: none; height: 100%;">
+      <ul class="layui-tab-title">
+        <li class="layui-this">
+          <a href="javascript:;">
+            <i class="fa fa-dashboard" aria-hidden="true"></i>
+            <cite>控制面板</cite>
+          </a>
+        </li>
+      </ul>
+      <div class="layui-tab-content" style="min-height: 150px; padding: 5px 0 0 0;">
+        <div class="layui-tab-item layui-show">
+          <iframe src="{:U('Public/main')}"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="site-tree-mobile layui-hide">
+    <i class="layui-icon">&#xe602;</i>
+  </div>
+  <div class="site-mobile-shade"></div>
+  <!--页脚-->
+  <!--<div class="layui-footer beg-layout-footer"></div>-->
+</div>
+
+<!--<script type="text/javascript" src="__ADMIN__/js/index.js"></script>-->
+<script>
+  base_url = "__ADMIN__/";
+</script>
+<script src="__ADMIN__/plugins/layui/layui.js"></script>
+<script src="__ADMIN__/js/layout.js?v={$V}"></script>
+<script type="text/javascript">
+  layui.use(['layer', 'element', 'jquery', 'form'], function () {
+    var layer = layui.layer
+      , element = layui.element()
+      , jq = layui.jquery,
+      form = layui.form();
+
+    jq('.update_cache').click(function () {
+      loading = layer.load(2, {
+        shade: [0.2, '#000']
+      });
+      jq.getJSON("{:U('System/clearCache')}", function (data) {
+        data.code = data.code || ((data.status === 1) ? +'{$Think.CODE_SUCCESS}' : +'{$Think.CODE_ERROR}');
+        data.msg = data.msg || data.info;
+        data.data = data.data || data.url;
+        if (data.code === +'{$Think.CODE_SUCCESS}') {
+          layer.close(loading);
+          layer.msg(data.msg, {icon: 1, time: 1000}, function () {
+            location.reload();
+          });
+        } else {
+          layer.close(loading);
+          layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+        }
+      });
+    });
+
+    jq('.logi_logout').click(function () {
+      loading = layer.load(2, {
+        shade: [0.2, '#000']
+      });
+      jq.getJSON("{:U('Login/logout')}", function (data) {
+        if (data.status == 1) {
+          layer.close(loading);
+          layer.msg(data.info, {icon: 1, time: 1000}, function () {
+            location.href = data.url;
+          });
+        } else {
+          layer.close(loading);
+          layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+        }
+      });
+    });
+
+  });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+<script type="x-template" id="art_info_components">
+  <div class="news-content">
+    <div class="news-title">
+      <h1>{{ artData.article_title }}</h1>
+      <p>时间：{{ artData.create_time | formatDate }}　|　点击({{ artData.read_num }})</p>
+    </div>
+    <div class="content-c" v-html="artData.content"></div>
+  </div>
+</script>
+<script>
+  COMPONENT.ART_INFO_COMPONENTS = {
+    template: '#art_info_components',
+    props: {
+      artData: Object
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.dateTime_Str(new Date(value * 1000), 'date');
+      }
+    },
+    data: function () {
+      return {}
+    }
+  }
+</script>

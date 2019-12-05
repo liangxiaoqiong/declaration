@@ -1,0 +1,88 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+<script>
+$(function () {
+	//更新排序
+	$('#update').click(function () {
+		$.post("{:U('sort', array('pid' => $pid))}", $('#form_do').serialize(),
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+});
+</script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <!--<div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                    {$type} 
+                    </h3>
+                </div>
+            </div>-->
+        	
+            <div class="layui-box-searchber">
+            	<button class="layui-btn layui-btn-small" onclick="goUrl('{:U('add', array('pid' => $pid))}')"><i class="layui-icon">&#xe608;</i> 添加地区</button>
+                <button class="layui-btn layui-btn-small" id="update"><i class="layui-icon">&#x1002;</i> 更新排序</button>
+                <button class="layui-btn layui-btn-small layui-btn-danger" data-url="{:U('del', array('batchFlag' => 1,'pid' => $pid))}"  lay-submit lay-filter="alldelete"><i class="layui-icon">&#x1006;</i> 删除</button>
+                <if condition="$pid gt 0">
+                <button class="layui-btn layui-btn-small layui-btn-normal" onclick="goUrl('{:U('index', array('pid' => 0))}')"><i class="layui-icon">&#xe603;</i> 返回顶级</button>
+                <else/>                
+                <button class="layui-btn layui-btn-small layui-btn-warm" onclick="goUrl('{:U('createJsArea', array('pid' => 0))}')"> 生成JS</button>
+                </if>   
+            </div>
+        	<!--<hr>-->
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th width="5%" align="center"><input type="checkbox" name="checkAll" lay-filter="checkAll"></th>
+                <th>ID</th>
+                <th>名称</th>
+                <th>简称</th>
+                <th>英文名</th>
+                <th>排序</th>
+                <th class="text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='vlist' item='v'>
+                <tr>
+                    <td><input type="checkbox" name="key[]" value="{$v.id}" lay-filter="checkOne"></td>
+                    <td>{$v.id}</td>
+                    <td class="aleft"><a href="{:U('Area/index',array('pid' => $v['id']))}">{$v.name}</a></td>
+                    <td>{$v.sname}</td>
+                    <td>{$v.ename}</td>
+                    <td><input type="text" name="sortlist[{$v.id}]" value="{$v.sort}" id="sortlist" size="2" class="layui-input" /></td>
+                    <td class="text-right">
+                    <a href="{:U('edit',array('id' => $v['id'], 'pid' => $v['pid']))}" class="layui-btn layui-btn-normal layui-btn-mini">修改</a>
+                    <a href="javascript:;" data-url="{:U('del', array('id' => $v['id'], 'pid' => $v['pid']))}" class="elementdel layui-btn layui-btn-danger layui-btn-mini">删除</a>
+                    </td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+		</div>	
+        
+	</div>
+    <div class="btable-paged" >
+        <div class="layui-main">
+        	<ul class="pagination">{$page}</ul>
+        </div>
+    </div>
+</block>

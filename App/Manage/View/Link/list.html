@@ -1,0 +1,83 @@
+<!--管理员：友情链接列表-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="table-search">
+      <div class="search-list">
+        <div class="search-list-item">
+          <label>链接名称</label>
+          <el-input v-model="query.link_name" placeholder="请输入链接名称"></el-input>
+        </div>
+        <div class="search-list-item">
+          <label>显示状态</label>
+          <el-select v-model="query.is_show">
+            <el-option value="0" label="全部"></el-option>
+            <el-option value="1" label="不显示"></el-option>
+            <el-option value="2" label="显示"></el-option>
+          </el-select>
+        </div>
+      </div>
+      <div class="search-btn">
+        <button type="button" class="btn-default" @click="getTableData({page: 1, limit: query.limit})">搜索</button>
+        <button type="button" class="btn-default" @click="resetSearch">清空</button>
+      </div>
+      <div class="search-btn-other">
+        <a class="btn-green" style="width: 127px;" @click="showLinkInfoLayer('add')">+ 添加新的链接</a>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th>链接ID</th>
+          <th>链接地址</th>
+          <th>链接名称</th>
+          <th>排序</th>
+          <th>是否显示</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-if="+tableData.total > 0">
+          <tr v-for="data in tableData.list">
+            <td>{{ data.link_id }}</td>
+            <td>{{ data.link_url }}</td>
+            <td>{{ data.link_name }}</td>
+            <td>
+              <input type="text" v-model="data.sort" class="myui-input" style="width: 50px;text-align: center"
+                     @blur="changeSort(data)" @keyup="sortVerify(data)">
+            </td>
+            <td>
+              <el-switch @change="changeLinkShow(data)"
+                         v-model="data.is_show"
+                         active-value="1"
+                         inactive-value="0"
+                         active-color="#13ce66"
+                         inactive-color="#ff4949">
+              </el-switch>
+            </td>
+            <td>{{ data.create_time | formatDate }}</td>
+            <td>
+              <a class="layui-btn layui-btn-normal layui-btn-xs" @click="showLinkInfoLayer('edit', data)">修改</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" @click="delLink(data)">删除</a>
+            </td>
+          </tr>
+        </template>
+        <template v-else>
+          <tr><td colspan="5" class="table-null">暂无数据</td></tr>
+        </template>
+        </tbody>
+      </table>
+      <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+    </div>
+
+    <template v-if="temp.linkDialog.showDialog">
+      <link-info :link-data="temp.linkDialog" @page-event="getTableData"></link-info>
+    </template>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Link/linkInfo"/>
+  <script type="text/javascript" src="__ADMIN__/js/Link/list.js?v={$V}"></script>
+</block>

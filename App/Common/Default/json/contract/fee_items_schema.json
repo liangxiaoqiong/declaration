@@ -1,0 +1,38 @@
+{
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "array",
+    "properties": {
+      "item_id": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "\\S+"
+      },
+      "item_name": {
+        "type": "string",
+        "required": true,
+        "pattern": "\\S+"
+      },
+      "fee_type": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "^[0,1]$"
+      },
+      "fee": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "^[-\\+]?\\d+(\\.\\d+)?$"
+      }
+    }
+  }
+}

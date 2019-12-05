@@ -1,0 +1,52 @@
+{
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "array",
+    "properties": {
+      "item_id": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "\\S+"
+      },
+      "item_name": {
+        "type": "string",
+        "required": true,
+        "pattern": "\\S+"
+      },
+      "unit": {
+        "type": "string",
+        "pattern": "\\S+"
+      },
+      "runit": {
+        "type": "string",
+        "required": true,
+        "pattern": "\\S+"
+      },
+      "unit_price": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "^[-\\+]?\\d+(\\.\\d+)?$"
+      },
+      "current": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "^[-\\+]?\\d+(\\.\\d+)?$"
+      },
+      "time": {
+        "type": "string",
+        "required": true,
+        "pattern": "^\\d{4}[\\/\\-](0?[1-9]|1[012])([\\/\\-](0?[1-9]|[12][0-9]|3[01]))?$"
+      }
+    }
+  }
+}

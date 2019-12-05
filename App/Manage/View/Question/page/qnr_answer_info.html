@@ -1,0 +1,59 @@
+<script type="x-template" id="qnr_answer_info">
+  <div class="dialog-default" style="z-index: 1002">
+    <div class="dialog-body">
+      <div class="dialog-head">
+        <h3>【{{answerData.dialogData.company_name}}】答卷【{{answerData.dialogData.qnr_name}}】</h3><a @click="answerData.showDialog = false"></a>
+      </div>
+      <div class="dialog-main custom-scrollbar qnr-answer-info">
+        <dl is="answer" v-for="(ques, index) in myQnrData.questions" :question="ques" :index="index"
+            :answer-data="myAnswerData"></dl>
+      </div>
+      <div class="dialog-foot">
+        <a @click="answerData.showDialog = false">关闭</a>
+      </div>
+    </div>
+  </div>
+</script>
+<include file="Question/components/answer_components"/>
+<script>
+  COMPONENT.QNR_ANSWER_INFO = {
+    template: '#qnr_answer_info',
+    components: {
+      'answer': COMPONENT.ANSWER_COMPONENTS
+    },
+    props: {
+      answerData: Object
+    },
+    data: function () {
+      return {
+        myQnrData: {
+          questions: []
+        },
+        myAnswerData: {
+          detail: [], // 答案详情
+        },
+      }
+    },
+    methods: {
+      loadInit: function () {
+        var self = this;
+        var loading = layer.load(2, {shade: [0.2, '#000']});
+        self.getQnrAns().then(function (result) {
+          self.myQnrData = result.data.qnr_data;
+          self.myAnswerData = result.data.answer_data;
+          layer.close(loading);
+        })
+      },
+      getQnrAns: function () {
+        var self = this;
+        return AppUtil.ajaxRequest({
+          url: APP + '/getAnswerDetail',
+          type: 'get',
+          data: {
+            answer_id: self.answerData.dialogData.answer_id,
+          },
+        })
+      },
+    }
+  }
+</script>

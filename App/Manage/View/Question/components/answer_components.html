@@ -1,0 +1,99 @@
+<!--问卷-用户答卷详情-组件-->
+<script type="x-template" id="answer_components">
+  <dl>
+    <dt>{{ index+1 }}、{{ question.question_title }}
+      <font v-if="+question.answer_type === 2" color="#999" style="font-size: 12px">(多选)</font>
+      <font v-if="+question.is_require === 1" color="red" style="font-size: 12px">(*必填)</font>
+    </dt>
+    <dd>
+      <template v-if="+question.answer_type === 0">
+        <div class="answer-info answer-info-active">{{ answer }}</div>
+      </template>
+      <template v-if="+question.answer_type === 1">
+        <!--单选项-->
+        <div class="answer-info">
+          <ul>
+            <li v-for="option in question.options" :class="{'answer-info-active': +answer === +option.option_id}">{{ option.option_value }}</li>
+          </ul>
+        </div>
+      </template>
+      <template v-if="+question.answer_type === 2">
+        <!--多选项-->
+        <div class="answer-info">
+          <ul>
+            <li v-for="option in question.options" :class="answerCheckbox(option)">{{ option.option_value }}</li>
+          </ul>
+        </div>
+      </template>
+    </dd>
+  </dl>
+</script>
+<script>
+  COMPONENT.ANSWER_COMPONENTS = {
+    template: '#answer_components',
+    props: {
+      question: Object, // 当前问题
+      index: [String, Number], // 当前问题的索引。
+      answerData: Object, // 答案。 这个对象是传递给接口的数据格式
+    },
+    data: function () {
+      return {}
+    },
+    computed: {
+      // 当前问题的答案在答案对象的索引
+      answerIndex: function () {
+        if (this.answerData.detail && this.answerData.detail.length > 0) {
+          for (var i = 0; i < this.answerData.detail.length; i++) {
+            if (this.answerData.detail[i].question_id == this.question.question_id) {
+              return i
+            }
+          }
+        }
+        return -1
+      },
+
+      // 答案对应的key 文本框存储的key是option_value，其他是存储的key是option_id
+      answerKey: function () {
+        return this.question.answer_type == 0 ? 'option_value' : 'option_id'
+      },
+
+      // 默认的答案值 多选时是数组 其余是字符串
+      defaultAnswerValue: function () {
+        return this.question.answer_type == 2 ? [] : ''
+      },
+
+      // 这道题的答案
+      answer: {
+        set: function (val) {
+          // 作答时把这道题的答案设置到对应的位置上
+          this.answerData.detail[this.answerIndex][this.answerKey] = val
+        },
+        get: function () {
+          // 新增回答、修改回答时， 首先都会先进入get，来获取这道题的答案
+          if (this.answerIndex === -1) {
+            // 如果没有这道题的答案 要使用默认值初始化一下
+            var obj = {}
+            obj.question_id = this.question.question_id
+            obj[this.answerKey] = this.defaultAnswerValue
+            this.answerData.detail.push(obj)
+          }else{
+            if(this.answerData.detail[this.answerIndex][this.answerKey] === ''){
+              this.answerData.detail[this.answerIndex][this.answerKey] = this.defaultAnswerValue
+            }
+          }
+          return this.answerData.detail[this.answerIndex][this.answerKey]
+        }
+      },
+      answerCheckbox: function () {
+        return function (item) {
+          if(this.answer.length > 0 && this.answer.indexOf(item.option_id) !== -1){
+            return 'answer-info-active'
+          }else{
+            return '';
+          }
+        }
+      }
+    },
+    methods: {}
+  }
+</script>

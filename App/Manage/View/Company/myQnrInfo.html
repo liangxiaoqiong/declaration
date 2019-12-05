@@ -1,0 +1,23 @@
+<!--我的问卷调查详情-->
+<script type="x-template" id="questionnaire_info">
+  <div class="dialog-default" style="padding-top: 40px">
+    <div class="dialog-body">
+      <div class="dialog-head">
+        <h3>{{propData.dialogData.qnr_name}}</h3>
+        <template v-if="!isForce">
+          <a @click="propData.showDialog = false"></a>
+        </template>
+      </div>
+      <div class="dialog-main custom-scrollbar myqnr-info">
+        <dl is="question" v-for="(ques, index) in myQnrData.questions" :question="ques" :index="index"
+            :answer-data="myAnswerData"></dl>
+      </div>
+      <div class="dialog-foot">
+        <a @click="submitMyQnr">交卷</a>
+        <a @click="syncQnr">同步问卷</a>
+      </div>
+    </div>
+  </div>
+</script>
+<include file="Company/components/question_components"/>
+<script type="text/javascript" src="__ADMIN__/js/Company/myQnrInfo.js?v={$V}"></script>

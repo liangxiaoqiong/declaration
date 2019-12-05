@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">	
+	<url>
+		<loc><{$config.site_url}></loc>
+		<lastmod><{$_SERVER.REQUEST_TIME|date='c',###}></lastmod>
+		<changefreq>Always</changefreq>
+		<priority>1.0</priority>
+	</url>
+	<volist name="article" id="vo">
+		<url>
+			<if condition="$config['site_html']">
+				<loc><{$config.site_url}>/article/<{$vo.id}></loc>
+			<else/>
+				<loc><{$config.site_url}>/index.php?m=article&a=index&id=<{$vo.id}></loc>
+			</if>
+			<lastmod><{$vo.time|date='c',###}></lastmod>
+			<changefreq>Always</changefreq>
+			<priority>0.6</priority>
+		</url>
+	</volist>
+</urlset>

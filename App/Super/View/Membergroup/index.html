@@ -1,0 +1,112 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+<script>
+layui.use(['form'],function(){
+  var form = layui.form()
+  ,jq = layui.jquery;
+  
+ var status=0;
+ form.on('switch(switchTest)', function(data){
+	  loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    if(data.elem.checked){
+	    	status=0;
+	    }else{
+	    	status=1;
+	    }
+	    var url="{:U('updatestatus')}";
+	    jq.get(url,{ id: data.value, status: status },function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+
+})
+</script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                    {$type} 
+                    </h3>
+                </div>
+            </div>
+        	
+            <div class="layui-box-searchber">
+            	<button class="layui-btn layui-btn-small" onclick="goUrl('{:U('add')}')"><i class="layui-icon">&#xe608;</i> 添加会员组</button>
+                <button class="layui-btn layui-btn-small layui-btn-danger" data-url="{:U('del', array('batchFlag' => 1))}" lay-submit lay-filter="alldelete"><i class="layui-icon">&#x1006;</i> 删除</button>
+                <form class="layui-form-pane" action="{:U('index')}" method="post" >
+                    <div class="layui-inline">
+                        <label class="layui-form-label">关键词</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="keyword" value="{$keyword}" placeholder="请输入关键词" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layui-btn-small">搜索</button>
+                    </div>
+                </form>    
+            </div>
+        	<!--<hr>-->
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th width="5%" align="center"><input type="checkbox" name="checkAll" lay-filter="checkAll"></th>
+                <th>ID</th>
+                <th>组名</th>
+                <th>积分级别值</th>
+                <th>状态</th>
+                <th class="text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='vlist' item='v'>
+                <tr>
+                    <td><input type="checkbox" name="key[]" value="{$v.id}" lay-filter="checkOne" <if condition="$v['id'] lt 4">disabled="disabled"</if> /></td>
+                    <td>{$v.id}</td>
+                    <td>{$v.name}</td>
+                    <td>{$v.rank} ~ {$v.rankend}</td>
+                    <td>
+                    <!--<if condition="$v['status']">禁用<else/>正常</if>-->
+                    <input type="checkbox" name="status" lay-skin="switch" lay-text="正常|禁用" lay-filter="switchTest"  value="{$v['id']}" <php>echo $v['status']==0 ? 'checked' : '';</php>>
+                    </td>
+                    <td class="text-right">
+                    <a href="{:U('edit',array('id' => $v['id']))}" class="layui-btn layui-btn-normal layui-btn-mini">修改</a>
+                    <if condition="$v['id'] gt 3">
+                    <a href="javascript:;" data-url="{:U('del',array('id' => $v['id']), '')}" class="elementdel layui-btn layui-btn-danger layui-btn-mini">删除</a>
+                    <else />
+                    <a href="javascript:;" class="layui-btn layui-btn-disabled layui-btn-mini">删除</a>
+                    </if>
+                    </td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+		</div>	
+        
+	</div>
+    <div class="btable-paged" >
+        <div class="layui-main">
+        	<ul class="pagination">{$page}</ul>
+        </div>
+    </div>
+</block>

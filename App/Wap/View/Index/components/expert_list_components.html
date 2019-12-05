@@ -1,0 +1,42 @@
+<script type="x-template" id="expert_list_components">
+  <div>
+    <div class="info-title news-title">
+      <h1>{{ childNav.nav_name }}</h1>
+      <p>{:get_cfg_value('CFG_OFFICIAL_TITLE')}　|　网址：{:get_cfg_value('CFG_WEBURL')}</p>
+    </div>
+    <div class="list-news expert-list">
+      <table>
+        <tr v-for="list in expListData">
+          <td>
+            <img :src="list.expert_logo">
+            <p>{{ list.expert_name }}</p>
+          </td>
+          <td>
+            <div>{{ list.expert_desc }}</div>
+            <div>{{ list.expert_title }}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</script>
+<script>
+  COMPONENT.EXPERT_LIST_COMPONENTS = {
+    template: '#expert_list_components',
+    props: {
+      childNav: Object,
+      expListData: Array
+    },
+    filters: {
+      /**时间过滤器*/
+      formatDate: function (value) {
+        return publicObj.dateTime_Str(new Date(value * 1000), 'date');
+      }
+    },
+    data: function () {
+      return {}
+    },
+    methods: {
+    }
+  }
+</script>

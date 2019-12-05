@@ -1,0 +1,46 @@
+{
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "array",
+    "properties": {
+      "question_id": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": false,
+        "pattern": "^\\d+$"
+      },
+      "question_title": {
+        "type": "string",
+        "required": true,
+        "pattern": "\\S+"
+      },
+      "answer_type": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "^[0|1|2]$"
+      },
+      "is_show": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "^[0|1]$"
+      },
+      "is_require": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "required": true,
+        "pattern": "^[0|1]$"
+      }
+    }
+  }
+}

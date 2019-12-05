@@ -1,0 +1,96 @@
+<!-- template -->
+<script type="x-template" id="date_picker_component">
+  <!--region 模版-->
+  <input type="text" class="layui-input myicon-input-date" readonly
+         v-date-pick="time" :value="timeStr"
+         v-bind="$attrs"/>
+  <!--endregion-->
+</script>
+
+<!-- JS -->
+<script>
+  COMPONENT.DATE_PICKER_COMPONENT = {
+    template: '#date_picker_component',
+    // 使用该组件式 v-model="xxx" 这里统一命名xx为timeStr
+    model: {
+      prop: 'timeStr',
+      event: 'input',
+    },
+    props: {
+      timeStr: String,
+    },
+    computed: {},
+    // 指令中修改了数据后 这里进行监听 并触发input事件,通知父组件 完成v-model
+    watch: {
+      'time.str': function (newValue) {
+        this.$emit('input', newValue)
+      }
+    },
+    mounted: function () {
+    },
+    data: function () {
+      return {
+        time: {
+          str: this.timeStr,
+          layDate: {}
+        }
+      }
+    },
+    methods: {},
+    directives: {
+      datePick: {
+        /**
+         * 初始化layDate
+         * @param el
+         * @param binding
+         */
+        inserted: function (el, binding) {
+          var options = {
+            elem: el,
+            done: function (value, date, endDate) {
+              binding.value.str = value
+            }
+          }
+          // 是否有设置最小值
+          var min = el.getAttribute('min')
+          if (min) {
+            options.min = min
+          }
+          // 是否设置了按钮
+          var btn = el.getAttribute('btn')
+          if (btn) {
+            options.btns = btn.split(',')
+          }
+          var type = el.getAttribute('data-type')
+          if (type) {
+            options.type = type
+          }
+          binding.value.layDate = laydate.render(options);
+        },
+        /**
+         * 数据有变更时
+         * @param el
+         * @param binding
+         */
+        componentUpdated: function (el, binding) {
+          var min = el.getAttribute('min')
+          if (min) {
+            var times = min.split('-')
+            binding.value.layDate.config.min = {
+              year: times[0],
+              month: times[1] - 1,
+              date: times[2],
+              hours: 0,
+              minutes: 0,
+              seconds: 0,
+            }
+            // 如果最小值比当前时间晚 当前时间设置为最小时间
+            if (AppUtil.isTime1AfterTime2(min, binding.value.str)) {
+              binding.value.str = min
+            }
+          }
+        }
+      },
+    }
+  }
+</script>

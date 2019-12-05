@@ -1,0 +1,74 @@
+<extend name="Public:base" />
+<block name="header_css">
+  <link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+  <script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+</block>
+<block name="content">
+  <div class="admin-main layui-form">
+    <div class="layui-field-box">
+
+      <div class="row">
+        <div class="col-lg-12">
+          <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i>
+            {$type}
+          </h3>
+        </div>
+      </div>
+
+      <div class="layui-box-searchber">
+        <button class="layui-btn layui-btn-small" onclick="goUrl('{:U('addRole')}')"><i class="layui-icon">&#xe608;</i> 添加用户组</button>
+        <button class="layui-btn layui-btn-small layui-btn-danger" data-url="{:U('delRole', array('batchFlag' => 1))}" lay-submit lay-filter="alldelete"><i class="layui-icon">&#x1006;</i> 删除</button>
+        <form class="layui-form-pane" action="{:U('role')}" method="post" >
+          <div class="layui-inline">
+            <label class="layui-form-label">关键词</label>
+            <div class="layui-input-inline">
+              <input type="text" name="keyword" value="{$keyword}" placeholder="用户名称" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <button class="layui-btn layui-btn-small">搜索</button>
+          </div>
+        </form>
+      </div>
+      <!--<hr>-->
+      <form action="" method="post" id="form_do" name="form_do">
+        <table class="layui-table admin-table">
+          <thead>
+          <tr>
+            <th width="5%" align="center"><input type="checkbox" name="checkAll" lay-filter="checkAll"></th>
+            <th>ID</th>
+            <th>用户组名称</th>
+            <th>描述</th>
+            <th>状态</th>
+            <th class="text-right">操作</th>
+          </tr>
+          </thead>
+          <tbody id="content">
+          <foreach name='role' item='v'>
+            <tr>
+              <td><input type="checkbox" name="key[]" value="{$v.id}" lay-filter="checkOne"></td>
+              <td>{$v.id}</td>
+              <td>{$v.name}</td>
+              <td>{$v.remark}</td>
+              <td><if condition="$v['status']">是<else/>否</if></td>
+              <td class="text-right">
+                <a href="{:U('access',array('rid' => $v['id']),'')}" class="layui-btn layui-btn-mini">权限</a>
+                <a href="{:U('addRole',array('id' => $v['id']))}" class="layui-btn layui-btn-normal layui-btn-mini">修改</a>
+                <a href="javascript:;" data-url="{:U('delRole',array('id' => $v['id']))}" class="elementdel layui-btn layui-btn-danger layui-btn-mini">删除</a>
+              </td>
+            </tr>
+          </foreach>
+          </tbody>
+        </table>
+      </form>
+    </div>
+
+  </div>
+  <div class="btable-paged" >
+    <div class="layui-main">
+      <ul class="pagination">{$page}</ul>
+    </div>
+  </div>
+</block>

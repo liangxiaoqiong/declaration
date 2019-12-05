@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="/Data/static/jq_plugins/vue-2.x/vue.js"></script>
+  <script src="//unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!--script-->
+<include file="Test/vue/src/router/index"/>
+<include file="Test/vue/src/App"/>
+<script>
+  var vm = new Vue({
+    el: '#app',
+    components: {
+      App: APP_COMPONENT
+    },
+    router: ROUTER,
+    template: '<App />'
+  })
+</script>
+</body>
+</html>

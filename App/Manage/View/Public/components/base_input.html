@@ -1,0 +1,66 @@
+<!-- template -->
+<script type="x-template" id="base_input_component">
+  <!--region 模版-->
+  <input type="text" :value="temp.value" v-bind="$attrs" @input="temp.value = $event.target.value"/>
+  <!--endregion-->
+</script>
+
+<!-- JS -->
+<script>
+  COMPONENT.BASE_INPUT_COMPONENT = {
+    template: '#base_input_component',
+    // 使用该组件式 v-model="xxx" 这里统一命名xx为timeStr
+    model: {
+      prop: 'value',
+      event: 'input',
+    },
+    props: {
+      value: [String, Number],
+      'trans-type': {
+        default: '',
+        type: String
+      },
+      'trans-precision': {
+        default: 2,
+        type: [String, Number]
+      }
+    },
+    computed: {},
+    watch: {
+      value: function (nVal) {
+        this.temp.value = nVal
+      },
+      'temp.value': function (nVal, oVal) {
+        if (this.transType !== '') {
+          var methods = {
+            'double': 'toDouble',
+            'absDouble': 'toAbsDouble',
+            'int': 'toInt',
+            'absInt': 'toAbsInt',
+          }
+          var method = methods[this.transType]
+          if (typeof AppUtil[method] === 'function') {
+            var func = AppUtil[method]
+            this.temp.value = func(nVal, this.transPrecision)
+          }
+        }
+        // //重发事件，改变父组件v-model绑定的值
+        this.$emit('input', this.temp.value);
+      },
+    },
+    mounted: function () {
+      if (typeof this.value !== 'undefined') {
+        this.temp.value = this.value
+      }
+    },
+    data: function () {
+      return {
+        temp: {
+          value: ''
+        },
+      }
+    },
+    methods: {},
+    directives: {}
+  }
+</script>

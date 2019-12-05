@@ -1,0 +1,193 @@
+<!--企业认证-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main panel panel-default enterprise-certification" id="app" v-cloak="">
+    <blockquote class="layui-elem-quote">
+      企业认证( <em>*为必填项</em> )
+      <span id="companyState" style="color:deepskyblue;">当前企业认证状态：</span>
+      <font>{{companyAuthStatus}}</font>
+      <span style="margin-left: 15px;" v-html="companyAuditStatus"></span>
+    </blockquote>
+    <div class="color-red" v-if="+info.audit_status === 2">审核拒绝原因：{{ info.audit_reason }}</div>
+    <div class="form-div">
+      <fieldset class="layui-elem-field layui-field-title">
+        <legend>企业基本信息</legend>
+      </fieldset>
+      <el-form :model="info" ref="ruleForm" :rules="rules" class="form-default" label-width="110px">
+        <el-form-item
+            label="公司名称" prop="company_name"
+            :rules="[{ required: true, message: '请输入公司名称' }]">
+          <el-input type="text" v-model="info.company_name" placeholder="请输入公司名称"></el-input>
+        </el-form-item>
+        <el-form-item label="公司性质" prop="company_form"
+                      :rules="[{ required: true, message: '请选择公司性质' }]">
+          <el-select v-model="info.company_form">
+            <el-option v-for="type in companyQuery.company_form" :value="type.id" :label="type.item_name"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属地区" prop="city" class="is-required">
+          <div class="select-city">
+            <div>
+              <select class="form-control" id="province" v-model="info.area_id_1" lay-ignore>
+                <option value="">所在省份</option>
+              </select>
+            </div>
+            <div>
+              <select class="form-control" id="city" v-model="info.area_id_2" lay-ignore>
+                <option value="">所在市</option>
+              </select>
+            </div>
+            <div>
+              <select class="form-control" id="area" v-model="info.area_id_3" lay-ignore>
+                <option value="">所在区</option>
+              </select>
+            </div>
+          </div>
+        </el-form-item>
+        <el-form-item label=" " prop="is_high_new" class="is-required">
+          <el-checkbox v-model="info.is_high_new" true-label="1" false-label="0">是否高新企业</el-checkbox>
+        </el-form-item>
+        <el-form-item label="所有制形式" prop="capital_form"
+                      :rules="[{ required: true, message: '请选择所有制形式' }]">
+          <el-select v-model="info.capital_form">
+            <el-option v-for="capital in companyQuery.capital_form" :value="capital.id"
+                       :label="capital.item_name"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+            label="企业法人代码" prop="license_no"
+            :rules="[{ required: true, message: '请输入统一社会信用代码' }]">
+          <el-input type="text" v-model="info.license_no" placeholder="请输入统一社会信用代码"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="注册地址" prop="address"
+            :rules="[{ required: true, message: '请输入注册地址' }]">
+          <el-input type="text" v-model="info.address" placeholder="请输入注册地址"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="注册资本(万元)" prop="capital"
+            :rules="[{ required: true, message: '请输入注册资本（万元）' }, {type: 'number', message: '注册资本金额必须为数值'}]">
+          <el-input type="text" v-model.number="registerCapital" placeholder="请输入注册资本（万元）"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="成立时间" prop="establishment_time"
+            :rules="[{ required: true, message: '请选择成立时间' }]">
+          <el-date-picker
+              v-model="establishmentTime"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="请选择成立时间">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item
+            label="法人代表" prop="legal_person"
+            :rules="[{ required: true, message: '请输入法人代表' }]">
+          <el-input type="text" v-model="info.legal_person" placeholder="请输入法人代表"></el-input>
+        </el-form-item>
+        <el-form-item class="is-required"
+                      label="法人手机" prop="lp_mobile">
+          <el-input type="text" v-model="info.lp_mobile" placeholder="请输入法人手机"></el-input>
+        </el-form-item>
+        <el-form-item class="is-required"
+                      label="企业电话" prop="tel">
+          <el-input type="text" v-model="info.tel" placeholder="请输入企业电话"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="企业邮箱" prop="email"
+            :rules="[{ required: true, message: '请输入企业邮箱' },{ type: 'email', message: '请输入正确的邮箱地址' }]">
+          <el-input type="text" v-model="info.email" placeholder="请输入企业邮箱"></el-input>
+        </el-form-item>
+        <el-form-item></el-form-item>
+        <el-form-item class="height-2"
+                      label="公司简介" prop="introduction"
+                      :rules="[{ required: true, message: '请输入公司简介' }]">
+          <el-input type="textarea" rows="15" v-model="info.introduction" placeholder="请输入公司简介"></el-input>
+        </el-form-item>
+        <el-form-item class="height-2 is-required" label="企业营业执照" prop="license_image">
+          <div class="license-img">
+            <div class="license-img-preview"><img :src="info.license_image" alt="营业执照"></div>
+            <div class="license-img-upload">
+              <el-button @click="uploadClick" type="success" size="small">上传营业执照<i
+                  class="el-icon-upload el-icon--right"></i>
+                <upload-file v-model="info.license_image" ref="upload_file" hidden></upload-file>
+              </el-button>
+              <em class="font-12">备注：图片格式:(*.jpg;*.png),图片大小不超过1MB</em>
+            </div>
+          </div>
+        </el-form-item>
+        <el-form-item label="应用领域" prop="apply_fields" class="apply-fields height-1">
+          <el-checkbox-group v-for="applyFields in companyQuery.apply_fields" v-model="applyField">
+            <el-checkbox :label="applyFields.id">{{applyFields.item_name}}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item class="height-1"
+                      label="经营范围" prop="scope"
+                      :rules="[{ required: true, message: '请输入经营范围' }]">
+          <el-input type="textarea" rows="6" v-model="info.scope" placeholder="请输入经营范围"></el-input>
+        </el-form-item>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;width: 100%;">
+          <legend>联系人信息</legend>
+        </fieldset>
+        <el-form-item
+            label="姓名" prop="contact_name"
+            :rules="[{ required: true, message: '请输入姓名' }]">
+          <el-input type="text" v-model="info.contact_name" placeholder="请输入姓名"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="职务" prop="contact_duty"
+            :rules="[{ required: true, message: '请输入职务' }]">
+          <el-input type="text" v-model="info.contact_duty" placeholder="请输入职务"></el-input>
+        </el-form-item>
+        <el-form-item class="is-required"
+                      label="手机" prop="contact_mobile">
+          <el-input type="text" v-model="info.contact_mobile" placeholder="请输入手机"></el-input>
+        </el-form-item>
+        <el-form-item class="is-required"
+                      label="电话" prop="contact_tel">
+          <el-input type="text" v-model="info.contact_tel" placeholder="请输入电话"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="传真" prop="contact_fax" class="is-required">
+          <el-input type="text" v-model="info.contact_fax" placeholder="请输入传真"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="邮箱" prop="contact_email"
+            :rules="[{ required: true, message: '请输入邮箱' },{ type: 'email', message: '请输入正确的邮箱地址' }]">
+          <el-input type="text" v-model="info.contact_email" placeholder="请输入邮箱"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="QQ" prop="contact_qq">
+          <el-input type="text" v-model="info.contact_qq" placeholder="请输入QQ"></el-input>
+        </el-form-item>
+        <el-form-item
+            label="微信" prop="contact_wechat">
+          <el-input type="text" v-model="info.contact_wechat" placeholder="请输入微信"></el-input>
+        </el-form-item>
+
+        <el-form-item class="form-submit">
+          <button type="button" class="layui-btn" @click="validateForm('ruleForm', 1)" v-if="canSave">立即保存</button>
+          <button type="button" class="layui-btn layui-default" @click="validateForm('ruleForm', 2)" v-if="canApply">
+            认证提交
+          </button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div style="margin-left:20px;" class="font-12">
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+        <legend>填报说明</legend>
+      </fieldset>
+      <em>1、未认证的企业用户，在未提交申请、申请失败后，都可以一直提交申请操作</em> </br></br>
+      <em>2、已认证的企业用户，可以修改自己的相关信息，无法执行提交申请操作</em>  </br></br>
+      <em>立即保存：只保存当前数据，不提交对应申请</em>  </br></br>
+      <em>立即提交：提交审核资料申请认证，审核期间、审核通过 都无法再次提交</em>  </br></br>
+
+    </div>
+  </div>
+</block>
+<block name="footer_js">
+  <script>
+    var company_id = "{$ADMIN['company_id']}";
+  </script>
+  <script src="__CITY_JS__"></script>
+  <script type="text/javascript" src="__ADMIN__/js/Company/companyInfo.js?v={$V}"></script>
+</block>

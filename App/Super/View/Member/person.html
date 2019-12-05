@@ -1,0 +1,134 @@
+<extend name="Public:base" />
+<block name="header_js">
+<script type="text/javascript" src="__PUBLIC__/js/calendar.config.js"></script>
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe642;</i> 
+                {$type}
+                </h3>
+            </div>
+            
+        </div>
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('person')}">
+                    
+            <div class="layui-form-item">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="realname" value="{$vo.realname}" required lay-verify="required" placeholder="姓名" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">性别</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="sex" value="0" <if condition="$vo['sex'] eq 0">checked="checked"</if> title="男" />	
+                    <input type="radio" name="sex" value="1" <if condition="$vo['sex'] eq 1">checked="checked"</if> title="女" />
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">出生年月</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="birthday" id="birthday" value="{$vo.birthday}" class="layui-input" placeholder="出生年月" />
+                </div>
+                <script type="text/javascript">
+					Calendar.setup({
+						weekNumbers: true,
+						inputField : "birthday",
+						trigger    : "birthday",
+						dateFormat: "%Y-%m-%d",
+						showTime: true,
+						minuteStep: 1,
+						onSelect   : function() {this.hide();}
+					});
+				</script>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">联系地址</label>
+                <div class="layui-input-inline" style="width:50%">
+                    <input type="text" name="address" value="{$vo.address}" class="layui-input" placeholder="联系地址" />
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">联系电话</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="tel" value="{$vo.tel}" class="layui-input" placeholder="联系电话" />
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">手机</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="mobile" value="{$vo.mobile}" class="layui-input" placeholder="手机" />
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">QQ</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="qq" value="{$vo.qq}" class="layui-input" placeholder="QQ" />
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">签名</label>
+                <div class="layui-input-inline" style="width:50%">
+                    <textarea name="maxim" id="inputMaxim" class="layui-textarea">{$vo.maxim}</textarea>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                    <input type="hidden" name="id" value="{$vo.userid}" />			
+					<input type="hidden" name="new" value="{$vo.new}" />
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>更新 </button>
+                    <button onclick="history.go(-1);" class="layui-btn layui-btn-primary layui-btn-small"><i class="layui-icon">&#xe603;</i>返回 </button>
+                    </div>
+                 </div>
+             </div>
+         </form>
+    </div>
+    <script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	</script>
+</block>

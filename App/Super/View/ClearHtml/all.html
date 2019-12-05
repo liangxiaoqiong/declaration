@@ -1,0 +1,245 @@
+<extend name="Public:base" />
+<block name="header_css">
+<link rel="stylesheet" href="__ADMIN__/css/form.css">
+</block>
+<block name="header_js">
+<script type="text/javascript" src="__ADMIN__/js/delelement.js"></script>
+<script>
+$(function () {
+	$('#updateall').click(function () {
+		var url= $(this).data('url');
+		loading = layer.load(2, {
+		  shade: [0.2,'#000']
+		});
+		$.post(url, {},
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+	
+	$('#updatehome').click(function () {
+		var url= $(this).data('url');
+		loading = layer.load(2, {
+		  shade: [0.2,'#000']
+		});
+		$.post(url, {},
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+	
+	$('#updatelists').click(function () {
+		var is_check = false;
+		$("input[lay-filter='checkOne']").each(function(){
+		  if($(this).prop('checked')){ is_check = true; }
+		});
+		if(!is_check){
+		  layer.msg('请选择数据', {icon: 2,anim: 6,time: 1000});
+		  return false;
+		}
+		var url= $(this).data('url');
+		loading = layer.load(2, {
+		  shade: [0.2,'#000']
+		});
+		$.post(url, $('#form_do').serialize(),
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+	
+	$('#updatelistsall').click(function () {
+		var url= $(this).data('url');
+		loading = layer.load(2, {
+		  shade: [0.2,'#000']
+		});
+		$.post(url, {},
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+	
+	$('#updateshows').click(function () {
+		var is_check = false;
+		$("input[lay-filter='checkOne']").each(function(){
+		  if($(this).prop('checked')){ is_check = true; }
+		});
+		if(!is_check){
+		  layer.msg('请选择数据', {icon: 2,anim: 6,time: 1000});
+		  return false;
+		}
+		var url= $(this).data('url');
+		loading = layer.load(2, {
+		  shade: [0.2,'#000']
+		});
+		$.post(url, $('#form_do').serialize(),
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+	
+	$('#updateshowsall').click(function () {
+		var url= $(this).data('url');
+		loading = layer.load(2, {
+		  shade: [0.2,'#000']
+		});
+		$.post(url, {},
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+	
+	$('#updatespecialall').click(function () {
+		var url= $(this).data('url');
+		loading = layer.load(2, {
+		  shade: [0.2,'#000']
+		});
+		$.post(url, {},
+			function (jsonData, status) {
+				if (jsonData.status == 1) {
+					layer.msg(jsonData.info, {icon: 1, time: 1000}, function (index) {
+						location.reload();
+					});
+				} else {
+					layer.msg(jsonData.info, {icon: 2, anim: 6, time: 1000});
+				}
+			}, 'json'
+		)
+	});
+	
+});
+</script>
+</block>
+<block name="content">
+	<div class="admin-main layui-form">
+        <div class="layui-field-box">
+        
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe62a;</i> 
+                    {$type} 
+                    </h3>
+                </div>
+            </div>
+            
+        	<if condition='ACTION_NAME eq "all"'>
+            <div style="margin-top:10px;">
+                <blockquote class="layui-elem-quote layui-quote-nm"><i class="layui-icon">&#xe60b;</i> 提示：只有开启静态缓存，才能使用此功能。 一键更新全站静态缓存(Html)。</blockquote>
+            </div>
+            <button class="layui-btn layui-btn-small" data-url="{:U('ClearHtml/all')}" id="updateall"><i class="layui-icon">&#x1002;</i> 开始更新全站</button>
+            </if>
+            
+            <if condition='ACTION_NAME eq "home"'>
+            <div style="margin-top:10px;">
+                <blockquote class="layui-elem-quote layui-quote-nm"><i class="layui-icon">&#xe60b;</i> 提示：只有开启静态缓存，才能使用此功能。 更新首页静态缓存(Html)。</blockquote>
+            </div>
+            <button class="layui-btn layui-btn-small" data-url="{:U('ClearHtml/home')}" id="updatehome"><i class="layui-icon">&#x1002;</i> 开始更新首页</button>
+            </if>
+            
+            <if condition='ACTION_NAME eq "lists"'>
+            <div style="margin-top:10px;">
+                <blockquote class="layui-elem-quote layui-quote-nm"><i class="layui-icon">&#xe60b;</i> 提示：只有开启静态缓存，才能使用此功能。 更新栏目列表静态缓存(Html)。</blockquote>
+            </div>
+            <button class="layui-btn layui-btn-small" data-url="{:U('ClearHtml/lists')}" id="updatelists"><i class="layui-icon">&#x1002;</i> 更新选中的栏目</button>
+            <button class="layui-btn layui-btn-small layui-btn-normal" data-url="{:U('ClearHtml/lists', array('isall' => 1))}" id="updatelistsall"><i class="layui-icon">&#x1002;</i> 一键更新所有栏目</button>
+            
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th width="5%" align="center"><input type="checkbox" name="checkAll" lay-filter="checkAll"></th>
+                <th>栏目</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='cate' item='v'>
+                <tr>
+                    <td><input type="checkbox" name="key[]" value="{$v.id}" lay-filter="checkOne"></td>
+                    <td>{$v.delimiter}<if condition="$v['pid'] neq 0">├─</if>{$v.name}</td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+            </if>
+            
+            <if condition='ACTION_NAME eq "shows"'>
+            <div style="margin-top:10px;">
+                <blockquote class="layui-elem-quote layui-quote-nm"><i class="layui-icon">&#xe60b;</i> 提示：只有开启静态缓存，才能使用此功能。 更新文档(内容页)静态缓存(Html)。</blockquote>
+            </div>
+            <button class="layui-btn layui-btn-small" data-url="{:U('ClearHtml/shows')}" id="updateshows"><i class="layui-icon">&#x1002;</i> 更新选中的栏目下文档</button>
+            <button class="layui-btn layui-btn-small layui-btn-normal" data-url="{:U('ClearHtml/shows', array('isall' => 1))}" id="updateshowsall"><i class="layui-icon">&#x1002;</i> 一键更新所有文档</button>
+            <form action="" method="post" id="form_do" name="form_do">
+            <table class="layui-table admin-table">
+            <thead>
+              <tr>
+                <th width="5%" align="center"><input type="checkbox" name="checkAll" lay-filter="checkAll"></th>
+                <th>栏目</th>
+              </tr>
+            </thead>
+            <tbody id="content">
+                <foreach name='cate' item='v'>
+                <tr>
+                    <td><input type="checkbox" name="key[]" value="{$v.id}" <if condition="$v.tablename eq 'page'">disabled="disabled"</if> lay-filter="checkOne" /></td>
+                    <td class="aleft">{$v.delimiter}<if condition="$v['pid'] neq 0">├─</if>{$v.name}</td>
+                </tr>
+                </foreach>
+            </tbody>
+            </table>
+            </form>
+            </if>
+            
+            <if condition='ACTION_NAME eq "special"'>
+            <div style="margin-top:10px;">
+                <blockquote class="layui-elem-quote layui-quote-nm"><i class="layui-icon">&#xe60b;</i> 提示：只有开启静态缓存，才能使用此功能。 更新专题静态缓存(Html)。</blockquote>
+            </div>
+            <!--<button class="layui-btn layui-btn-small" data-url="{:U('ClearHtml/special')}" id="updatespecial"><i class="layui-icon">&#x1002;</i> 更新专题列表</button>-->
+            <button class="layui-btn layui-btn-small" data-url="{:U('ClearHtml/special', array('isall' => 1))}" id="updatespecialall"><i class="layui-icon">&#x1002;</i> 一键更新所有专题</button>
+            </if>
+            
+		</div>	
+        
+	</div>
+    
+</block>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+  <title>厦门市虚拟与增强现实产业协会</title>
+  <link rel="stylesheet" type="text/css" href="__DATA__/static/jq_plugins/element-ui/2.4.3/theme-chalk/index.css">
+  <link rel="stylesheet" type="text/css" href="__DATA__/static/jq_plugins/swiper/swiper-3.4.2.min.css"/>
+  <link rel="stylesheet" type="text/css" href="__DATA__/wap/css/style.css?v={$V}"/>
+</head>
+<body>
+<div id="app" v-cloak="">
+  <top-nav-components ref="topNavComponents" :nav-data="topNavData" :this-nav="thisNav"></top-nav-components>
+  <router-view></router-view>
+  <!--底部-->
+  <com-foot-components :links="links"></com-foot-components>
+
+</div>
+</body>
+<include file="Public:base"/>
+<include file="Index/components/top_nav"/>
+<include file="Index/components/foot_link"/>
+<include file="Index/pages/com_index_pages"/>
+<include file="Index/pages/com_info_pages"/>
+<include file="Index/components/com_foot"/>
+<script>
+  var routes = [
+    { path: '/', component: COMPONENT.COM_INDEX_PAGES},
+    { path: '/info', component: COMPONENT.COM_INFO_PAGES},
+    { path: '/art-list', component: COMPONENT.COM_INFO_PAGES},
+    { path: '/art-info', component: COMPONENT.COM_INFO_PAGES},
+    { path: '/expert', component: COMPONENT.COM_INFO_PAGES},
+    { path: '/member-list', component: COMPONENT.COM_INFO_PAGES},
+    { path: '/member-info', component: COMPONENT.COM_INFO_PAGES},
+  ]
+  var router = new VueRouter({
+    mode: 'history',
+    routes
+  })
+  var vm = new Vue({
+    //el: '#app',
+    components:{
+      'top-nav-components': COMPONENT.TOP_NAV_COMPONENTS,
+      'com-index-pages': COMPONENT.COM_INDEX_PAGES,
+      'com-info-pages': COMPONENT.COM_INFO_PAGES,
+      'com-foot-components': COMPONENT.COM_FOOT_COMPONENTS
+    },
+    router,
+    watch: {
+      '$route.path': function () {
+        var self = this;
+        self.$nextTick(function () {
+          if(self.$route.path === '/index'){
+            self.initSwiper()
+          }
+        })
+      },
+      '$route': 'fetchData'
+    },
+    data: function () {
+      return {
+        isPC: ($(document.body).width() > 1024) ? true : false,//是否PC端
+        loadComplete: false,
+        topNavData: {
+          navList: [],
+          navArr: {},
+          navType2: {},
+          navType3: {}
+        },//顶部导航数据
+        adList: [],
+
+        // 导航及文章
+        navAndArt: [],
+
+        // 专家
+        expert: [],
+
+        // 会员
+        member: [],
+        //企业
+        member_company: [],
+
+        // 链接
+        links: [],
+
+        temp: {
+          navAndArtTad: [],//首页左侧tab
+        },
+        thisNav: {
+          parentNav: {nav_id: 0},
+          childNav: {nav_id: 0}
+        },
+        thisArt: {},
+        thisMember: {},
+      }
+    },
+    created: function () {
+      this.loadInit()
+     // this.fetchData()
+    },
+    mounted: function () {
+      //this.fetchData()
+    },
+    methods: {
+      loadInit: function () {
+        var self = this;
+        self.getNavData().then(function (result) {
+          self.topNavData.navList = result.data;
+          var arr = {}
+          var navType2 = []
+          var navType3 = []
+          self.topNavData.navList.forEach(function (value, index, json) {
+            arr[value.nav_id] = json[index]
+            if(+value.nav_type === 2){
+              navType2.push(json[index])
+            }
+            if(+value.nav_type === 3){
+              navType3.push(json[index])
+            }
+            if(typeof value.child !== 'undefined'){
+              value.child.forEach(function (value2, index2, json2) {
+                arr[value2.nav_id] = json2[index2]
+                if(+value2.nav_type === 2){
+                  navType2.push(json2[index2])
+                }
+                if(+value2.nav_type === 3){
+                  navType3.push(json2[index2])
+                }
+              })
+            }
+          })
+          self.topNavData.navArr = arr
+          self.topNavData.navType2 = navType2
+          self.topNavData.navType3 = navType3
+          return self.getIndexData()
+        }).then(function (result) {
+          self.$nextTick(function () {
+            self.adList = result.data.ad_data
+            self.navAndArt = result.data.nav_art_data
+            self.navAndArt.forEach(function () {
+              self.temp.navAndArtTad.push(0)
+            })
+            self.expert = result.data.expert_data
+            self.member = result.data.member_data
+            if(self.member.length <= 4){
+              self.member_company.push(self.member)
+            }else{
+              var j = 0
+              var k = Math.round(self.member.length / 4)
+              for(var n = 0; n < k; n++){
+                var arr = []
+                self.member.forEach(function (value, index, json) {
+                  if(j*4 === index){
+                    if(index < self.member.length){
+                      self.$set(arr, 0, json[index])
+                    }
+                    if(index+1 < self.member.length){
+                      self.$set(arr, 1, json[index + 1])
+                    }
+                    if(index+2 < self.member.length){
+                      self.$set(arr, 2, json[index + 2])
+                    }
+                    if(index+3 < self.member.length){
+                      self.$set(arr, 3, json[index + 3])
+                    }
+                  }
+                })
+                j++
+                self.$set(self.member_company, n, arr)
+              }
+            }
+            self.links = result.data.link_data
+            if(self.$route.query.nid === undefined && self.$route.query.aid === undefined && self.$route.query.mid === undefined){
+               router.push('/')//初始页面默认index路由
+              self.initSwiper()
+            }
+            self.$refs.topNavComponents.loadInit()
+            self.loadComplete = true;
+            self.fetchData()
+          })
+        }).catch(function () {
+          self.fetchData()
+        })
+      },
+      //获取顶部导航数据
+      getNavData: function () {
+        return AppUtil.ajaxRequest({
+          url: APP + '/Nav/getNavData',
+          isLoad: false,
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        })
+      },
+      //获取
+      getIndexData: function () {
+        return AppUtil.ajaxRequest({
+          url: APP + '/getIndexData',
+          isLoad: false,
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+        })
+      },
+      //轮播swiper
+      initSwiper: function () {
+        var self = this;
+        self.$nextTick(function () {
+          new Swiper('.com-swiper .swiper-container', {
+            autoplay: 1800,
+            pagination: '.swiper-pagination',
+            prevButton: '.swiper-button-prev',
+            nextButton: '.swiper-button-next',
+          })
+          if(self.isPC){
+            var width = 340;
+            var width_company = 380;
+          }else{
+            var width = $(document.body).width() - 80;
+            var width_company = $(document.body).width() - 20;
+          }
+          new Marquee("list-user", 0, 2, width, 200, 50, 0, 0)
+          if(self.member.length >= 16){
+            new Marquee("list-company",0,40,width_company,416,20,2500,2500,416)
+          }
+
+        })
+      },
+      fetchData: function () {
+        var self = this
+        if(typeof self.$route.query.nid !== 'undefined') {
+          var nid = self.$route.query.nid
+          self.getNavFromNid(nid)
+        }
+        if(typeof self.$route.query.aid !== 'undefined'){
+          var aid = self.$route.query.aid
+          AppUtil.ajaxRequest({
+            url: APP + '/getArt',
+            contentType: AppUtil.CONTENT_TYPE_JSON,
+            data: {article_id: aid},
+            type: 'get',
+            isLoad: false,
+          }).then(function (result) {
+            self.thisArt = {}
+            if(result.data.article_id){
+              self.thisArt = result.data
+              self.getNavFromNid(result.data.nav_id)
+              self.clickArt(aid)
+            }
+          })
+        }
+        if(typeof self.$route.query.mid !== 'undefined'){
+          var mid = self.$route.query.mid
+          AppUtil.ajaxRequest({
+            url: APP + '/getMember',
+            contentType: AppUtil.CONTENT_TYPE_JSON,
+            data: {member_id: mid},
+            type: 'get',
+            isLoad: false,
+          }).then(function (result) {
+            self.thisMember = {}
+            if(result.data.member_id){
+              self.thisMember = result.data
+              self.getNavFromNid(self.topNavData.navType2[1].nav_id)
+            }
+          })
+        }
+        $('body,html').animate({scrollTop:0},1)
+      },
+      getNavFromNid: function (nid) {
+        var self = this
+        if ( +self.topNavData.navArr[nid].pid === 0) {
+          //选中的为一级导航，无子级
+          self.thisNav.parentNav = self.topNavData.navArr[nid]
+          self.thisNav.childNav = []
+        } else {
+          self.thisNav.parentNav = self.topNavData.navArr[self.topNavData.navArr[nid].pid]
+          self.thisNav.childNav = self.topNavData.navArr[nid]
+        }
+      },
+      //阅读文章增加点击量/index.php?s=/clickArt
+      clickArt: function (article_id) {
+        AppUtil.ajaxRequest({
+          url: APP + '/clickArt',
+          contentType: AppUtil.CONTENT_TYPE_JSON,
+          data: {article_id: article_id},
+          type: 'get',
+          isLoad: false,
+        })
+      },
+    }
+  }).$mount('#app')
+</script>
+<script>
+  /**
+   * 添加返回顶部图标（右下角）
+   * @param value
+   * @returns {}
+   */
+  toTopHtml();
+  function toTopHtml() {
+    $(document).scroll(function () {
+      var top = $(document).scrollTop();
+      //滚动条距离顶部大于300时显示置顶按钮
+      if (top > 300) {
+        var toTopHtml = $('#toTopHtml').html();
+        var html = '<a onclick="toTop();" id="toTopHtml"></a>';
+        if (toTopHtml == null) {
+          $('body').append(html);
+        }
+      }
+      else {
+        $('#toTopHtml').remove();
+      }
+
+    });
+  }
+  /**
+   * 点击右下角返回顶部icon=》滚动条置顶
+   * @param value
+   * @returns {}
+   */
+  function toTop(el) {
+    if (typeof (el) === 'undefined') {
+      if ($('html').scrollTop()) {
+        $('html').animate({scrollTop: 0}, 1000);
+        return false;
+      }
+      $('body').animate({scrollTop: 0}, 1000);
+      return false;
+    } else {
+      $(el).animate({scrollTop: 0}, 1000);
+    }
+  }
+</script>
+</html>

@@ -1,0 +1,184 @@
+<extend name="Public:base" />
+<block name="header_js">
+</block>
+
+<block name="content">
+	<div class="layui-field-box">
+    
+    	<!--<div class="row">
+            <div class="col-lg-12">
+                <h3 class="page-header"><i class="layui-icon" style="font-size:20px;">&#xe642;</i> 
+                伪静态与静态缓存  
+                </h3>
+            </div>
+            
+        </div>-->
+    	
+        <form method="post" class="layui-form form-container" id="form_do" data-url="{:U('url')}">
+        	<div>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">伪静态设置</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">URL模式</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="config[HOME_URL_MODEL]" value="0" <if condition="$vo['HOME_URL_MODEL'] eq 0">checked="checked"</if> title="普通模式" lay-filter="urlmodel" />
+                        <div style="color:#999">URL参数模式：http://www.xxx.com/index.php?m=List&a=index&id=1</div>
+                        <input type="radio" name="config[HOME_URL_MODEL]" value="1" <if condition="$vo['HOME_URL_MODEL'] eq 1">checked="checked"</if> title="PATHINFO模式" lay-filter="urlmodel" />
+                        <div style="color:#999">PATHINFO模式：http://www.xxx.com/index.php/List/index/id/1</div>
+                        <input type="radio" name="config[HOME_URL_MODEL]" value="2" <if condition="$vo['HOME_URL_MODEL'] eq 2">checked="checked"</if> title="REWRITE模式(需要URL_REWRITE支持)" lay-filter="urlmodel" />
+                        <div style="color:#999">REWRITE模式和PATHINFO模式功能一样,需开启URL_REWRITE模块(隐藏index.php),如：http://www.xxx.com/List/index/id/1/</div>
+                        <input type="radio" name="config[HOME_URL_MODEL]" value="3" <if condition="$vo['HOME_URL_MODEL'] eq 3">checked="checked"</if> title="兼容模式" lay-filter="urlmodel" />
+                        <div style="color:#999">兼容模式：http://www.xxx.com/index.php?s=/List/index/id/1</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">参数分割符</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="config[HOME_URL_PATHINFO_DEPR]" value="{$vo.HOME_URL_PATHINFO_DEPR}" class="layui-input">
+                    </div>
+                    <div class="label-tint">针对PATHINFO模式,默认为"/",如改为"-"：http://www.xxx.com/index.php/List-index-id-1</div>
+                </div>
+            </div>
+            
+            <div id="UrlRouter1" <if condition="$vo['HOME_URL_MODEL'] neq 1 && $vo['HOME_URL_MODEL'] neq 2"> style="display:none;"</if>>
+                <div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">开启URL路由(路由规则不熟悉的不要乱改)</blockquote>
+                </div>
+				<div class="layui-form-item">
+                    <label class="layui-form-label">开启路由</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="config[HOME_URL_ROUTER_ON]" value="1" <if condition="$vo['HOME_URL_ROUTER_ON'] eq 1">checked="checked"</if> title="开启" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">路由规则</label>
+                    <div class="layui-input-inline" style="width:60%;">
+                        <textarea name="config[HOME_URL_ROUTE_RULES]" class="layui-textarea" style="height:150px;">{$vo.HOME_URL_ROUTE_RULES}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div>
+            	<div style="margin-top:10px;">
+                    <blockquote class="layui-elem-quote">静态缓存(缓解服务器压力)</blockquote>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">开启静态缓存</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="config[HOME_HTML_CACHE_ON]" value="1" <if condition="$vo['HOME_HTML_CACHE_ON'] eq 1">checked="checked"</if> title="开启电脑版缓存" />
+                        <input type="checkbox" name="config[MOBILE_HTML_CACHE_ON]" value="1" <if condition="$vo['MOBILE_HTML_CACHE_ON'] eq 1">checked="checked"</if> title="开启手机版缓存" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缓存规则</label>
+                    
+                    <div class="layui-input-block">
+                    	<div class="layui-form-item">
+                            <div class="layui-input-inline">
+                            	<input type="checkbox" name="config[HTML_CACHE_INDEX_ON]" value="1" <if condition="$vo['HTML_CACHE_INDEX_ON'] eq 1">checked="checked"</if> title="首页缓存" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">缓存时间</div>
+                            <div class="layui-input-inline">
+                            	<input type="text" name="config[HTML_CACHE_INDEX_TIME]" class="layui-input" value="{$vo.HTML_CACHE_INDEX_TIME}" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">秒</div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-input-block">
+                    	<div class="layui-form-item">
+                            <div class="layui-input-inline">
+                            	<input type="checkbox" name="config[HTML_CACHE_LIST_ON]" value="1" <if condition="$vo['HTML_CACHE_LIST_ON'] eq 1">checked="checked"</if> title="栏目缓存" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">缓存时间</div>
+                            <div class="layui-input-inline">
+                            	<input type="text" name="config[HTML_CACHE_LIST_TIME]" class="layui-input" value="{$vo.HTML_CACHE_LIST_TIME}" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">秒</div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-input-block">
+                    	<div class="layui-form-item">
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="config[HTML_CACHE_SHOW_ON]" value="1" <if condition="$vo['HTML_CACHE_SHOW_ON'] eq 1">checked="checked"</if> title="文章缓存" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">缓存时间</div>
+                            <div class="layui-input-inline">
+                            	<input type="text" name="config[HTML_CACHE_SHOW_TIME]" class="layui-input" value="{$vo.HTML_CACHE_SHOW_TIME}" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">秒</div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-input-block">
+                    	<div class="layui-form-item">
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="config[HTML_CACHE_SPECIAL_ON]" value="1" <if condition="$vo['HTML_CACHE_SPECIAL_ON'] eq 1">checked="checked"</if> title="专题缓存" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">缓存时间</div>
+                            <div class="layui-input-inline">
+                            	<input type="text" name="config[HTML_CACHE_SPECIAL_TIME]" class="layui-input" value="{$vo.HTML_CACHE_SPECIAL_TIME}" />
+                            </div>
+                            <div class="layui-input-inline txt-inline">秒</div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+            	<label class="layui-form-label"></label>
+            	<div class="layui-input-inline"></div>
+            </div>
+                
+            <div class="btable-paged" >
+                <div class="layui-main">
+                    <div class="formbtngroup">
+                    <button class="layui-btn layui-btn-small" lay-submit="" lay-filter="formadd"><i class="layui-icon">&#xe618;</i>保存 </button>
+                    </div>
+                 </div>
+             </div>
+         </form>
+    </div>
+    <script>
+	layui.use(['form','upload','layer','element'],function(){
+	  var form = layui.form()
+	  ,jq = layui.jquery
+	  ,element = layui.element();
+	  
+	  //显示or隐藏URL模式
+	  form.on('radio(urlmodel)', function(data){
+		var val = data.value;
+		if (val == 1 || val ==2 ) {
+			jq('#UrlRouter1').show();
+		}else {
+			jq('#UrlRouter1').hide();
+
+		}
+	  });
+	  
+	  var url=jq('form').data('url');
+	  form.on('submit(formadd)', function(data){
+	    loading = layer.load(2, {
+	      shade: [0.2,'#000']
+	    });
+	    //var param = data.field;
+	    jq.post(url,jq('#form_do').serialize(),function(data){
+	    	
+	      if(data.status == 1){
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 1, time: 1000}, function(){
+	          location.href = data.url;
+	        });
+	      }else{
+	        layer.close(loading);
+	        layer.msg(data.info, {icon: 2, anim: 6, time: 1000});
+	      }
+	    });
+	    return false;
+	  });
+	
+	});
+	</script>
+</block>

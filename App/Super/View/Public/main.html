@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{:get_cfg_value('CFG_WEBTITLE')}</title>
+  <link rel="stylesheet" href="__ADMIN__/plugins/layui/css/layui.css" media="all"/>
+  <link rel="stylesheet" href="__ADMIN__/css/main.css?v={$V}" media="all"/>
+  <!--[if lt IE 9]>
+  <script src="__DATA__/static/js/html5shiv.min.js"></script>
+  <script src="__DATA__/static/js/respond.min.js"></script>
+  <![endif]-->
+  <script type="text/javascript" src="__ADMIN__/plugins/layui/layui.js"></script>
+</head>
+<body>
+<!--主体-->
+<div style="margin-bottom:36px;">
+  <div class="tpt—index fly-panel fly-panel-user">
+    <blockquote style="padding: 10px;border-left: 5px solid #009688;" class="layui-elem-quote">介绍：</blockquote>
+    <table width="100%">
+      <tr>
+        <td width="110px">主办单位</td>
+        <td>{:get_cfg_value('CFG_MAIN_UNIT')}</td>
+      </tr>
+      <tr>
+        <td>承办单位</td>
+        <td>{:get_cfg_value('CFG_DO_UNIT')}</td>
+      </tr>
+      <tr>
+        <td>技术支持</td>
+        <td>{:get_cfg_value('CFG_TECHNICAL_SUPPORT')}</td>
+      </tr>
+      <tr>
+        <td>联系方式</td>
+        <td>{:get_cfg_value('CFG_PHONE')}</td>
+      </tr>
+      <tr>
+        <td>传真</td>
+        <td>{:get_cfg_value('CFG_FAX')}</td>
+      </tr>
+    </table>
+    <blockquote style="padding: 10px;border-left: 5px solid #009688;" class="layui-elem-quote">联系我们：</blockquote>
+    <table width="100%">
+      <tr>
+        <td width="110px">地址</td>
+        <td>{:get_cfg_value('CFG_ADDRESS')}</td>
+      </tr>
+      <tr>
+        <td>邮编</td>
+        <td>{:get_cfg_value('CFG_ZIP_CODE')}</td>
+      </tr>
+      <tr>
+        <td>电话</td>
+        <td>{:get_cfg_value('CFG_PHONE')}</td>
+      </tr>
+      <tr>
+        <td>传真</td>
+        <td>{:get_cfg_value('CFG_FAX')}</td>
+      </tr>
+      <tr>
+        <td>网址</td>
+        <td><a href="{:get_cfg_value('CFG_WEBURL')}" target="_blank">{:get_cfg_value('CFG_WEBURL')}</a></td>
+      </tr>
+    </table>
+    <blockquote style="padding: 10px;border-left: 5px solid #009688;" class="layui-elem-quote">开发团队：</blockquote>
+    <table width="100%">
+      <tr>
+        <td width="110px">版权所有</td>
+        <td>{:get_cfg_value('CFG_POWERBY')}</td>
+      </tr>
+      <tr>
+        <td>特别提醒您</td>
+        <td>严禁删除、隐藏或更改版权信息，否则导致的一切损失由使用者自行承担。</td>
+      </tr>
+    </table>
+  </div>
+</div>
+</body>
+</html>

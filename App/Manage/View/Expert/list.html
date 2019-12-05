@@ -1,0 +1,93 @@
+<!--管理员：会员管理/专家团队-->
+<extend name="Public:base"/>
+<block name="content">
+  <div class="admin-main" id="app" v-cloak="" v-if="loadComplete">
+    <div class="table-search">
+      <div class="search-list">
+        <div class="search-list-item">
+          <label>专家姓名</label>
+          <el-input v-model="query.expert_name" placeholder="请输入专家姓名"></el-input>
+        </div>
+        <div class="search-list-item">
+          <label>专家职称</label>
+          <el-input v-model="query.expert_title" placeholder="请输入专家职称"></el-input>
+        </div>
+        <div class="search-list-item">
+          <label>显示状态</label>
+          <el-select v-model="query.is_show">
+            <el-option value="0" label="全部"></el-option>
+            <el-option value="1" label="不显示"></el-option>
+            <el-option value="2" label="显示"></el-option>
+          </el-select>
+        </div>
+        <div class="search-list-item">
+          <label>创建时间</label>
+          <datetime-range v-model="query.search_time" :time_range="query.search_time"></datetime-range>
+        </div>
+      </div>
+      <div class="search-btn">
+        <button type="button" class="btn-default" @click="getTableData({page: 1, limit: query.limit})">搜索</button>
+        <button type="button" class="btn-default" @click="resetSearch">清空</button>
+      </div>
+      <div class="search-btn-other">
+        <a class="btn-green" @click="showExpertInfoLayer('add')">+ 添加新专家</a>
+      </div>
+    </div>
+    <div>
+      <table class="layui-table">
+        <thead>
+        <tr>
+          <th>专家姓名</th>
+          <th>专家职称</th>
+          <th>专家照片</th>
+          <th>专家简介</th>
+          <th>排序</th>
+          <th>是否显示</th>
+          <th>上次修改时间</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-if="+tableData.total > 0">
+          <tr v-for="data in tableData.list">
+            <td>{{ data.expert_name }}</td>
+            <td>{{ data.expert_title }}</td>
+            <td><img :src="data.expert_logo" style="width: 60px"></td>
+            <td>{{ data.expert_desc }}</td>
+            <td>
+              <input type="text" v-model="data.sort" class="myui-input" style="width: 50px;text-align: center"
+                     @blur="changeExpertSort(data)" @keyup="sortVerify(data)">
+            </td>
+            <td>
+              <el-switch @change="changeExpertShow(data)"
+                         v-model="data.is_show"
+                         active-value="1"
+                         inactive-value="0"
+                         active-color="#13ce66"
+                         inactive-color="#ff4949">
+              </el-switch>
+            </td>
+            <td>{{ data.update_time | formatDate }}</td>
+            <td>
+              <a class="layui-btn layui-btn-normal layui-btn-xs" @click="showExpertInfoLayer('edit', data)">修改</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" @click="delExpert(data)">删除</a>
+            </td>
+          </tr>
+        </template>
+        <template v-else>
+          <tr><td colspan="8" class="table-null">暂无数据</td></tr>
+        </template>
+        </tbody>
+      </table>
+      <pagination :pag-data="{total: tableData.total, page: query.page, limit: query.limit}" @page-event="getTableData"></pagination>
+    </div>
+
+    <div v-show="temp.expertDialog.showDialog">
+      <expert-info ref="expertInfoLayer" :expert-data="temp.expertDialog" @page-event="getTableData"></expert-info>
+    </div>
+  </div>
+</block>
+<block name="footer_js">
+  <include file="Expert/expertInfo"/>
+  <script type="text/javascript" src="__ADMIN__/js/Expert/list.js?v={$V}"></script>
+</block>

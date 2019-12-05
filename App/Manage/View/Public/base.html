@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>后台</title>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <meta name="baidu-site-verification" content="unXl91MyB6"/>
+  <!--<link rel="stylesheet" type="text/css" href="__DATA__/static/bootstrap/3.3.5/css/bootstrap.min.css" media="screen">
+  <link rel='stylesheet' type="text/css" href="__PUBLIC__/css/main.css" />-->
+  <link rel="stylesheet" href="__ADMIN__/plugins/font-awesome/css/font-awesome.min.css"/>
+  <link rel="stylesheet" href="__ADMIN__/plugins/layui/css/layui.css" media="all"/>
+  <link rel="stylesheet" href="__DATA__/static/jq_plugins/jq-ui/jquery-ui.min.css" media="all"/>
+  <link rel="stylesheet" href="__DATA__/static/jq_plugins/element-ui/2.4.3/theme-chalk/index.css">
+  <link rel="stylesheet" href="__ADMIN__/css/main.css?v={$V}" media="all"/>
+  <link rel="stylesheet" href="__ADMIN__/css/admin.css?v={$V}" media="all"/>
+  <!-- 头部css文件|自定义  -->
+  <block name="header_css"></block>
+
+  <script type="text/javascript" src="__DATA__/static/js/jquery-1.11.3.min.js"></script>
+  <!--<script type="text/javascript" src="__DATA__/static/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
+
+  <!--[if lt IE 9]>
+  <link rel="stylesheet" href="__ADMIN__/css/ie9.css?v={$V}"/>
+  <script src="__DATA__/static/js/html5shiv.min.js"></script>
+  <script src="__DATA__/static/js/respond.min.js"></script>
+  <![endif]-->
+  <script type="text/javascript" src="__DATA__/static/jq_plugins/laydate/laydate.js"></script>
+  <script type="text/javascript" src="__ADMIN__/plugins/layui/layui.js"></script>
+  <script type="text/javascript" src="__PUBLIC__/js/jquery.form.min.js"></script>
+  <script type="text/javascript" src="__DATA__/static/jq_plugins/layer/layer.js"></script>
+  <script type="text/javascript" src="__VUE__"></script>
+  <script src="__DATA__/static/jq_plugins/element-ui/2.4.3/index.js"></script>
+  <script type="text/javascript" src="__DATA__/static/jq_plugins/jq-ui/jquery-ui.min.js"></script>
+  <script language="JavaScript">
+    <!--
+    var URL = '__URL__';
+    var APP = '__APP__';
+    var SELF = '__SELF__';
+    var PUBLIC = '__PUBLIC__';
+    var data_path = "__DATA__";
+    var tpl_public = "__PUBLIC__";
+    var REQ = '{$reqJson}';
+    var NOW_STR = "{$NOW_STR}";
+    REQ = JSON.parse(REQ);
+    //-->
+    /*
+define('CODE_SUCCESS', 200); // 请求成功
+define('CODE_LOGIN_SUCCESS', 201); // 登录成功后跳转
+define('CODE_REDIRECT', 301); // 请求后直接重定向
+define('CODE_ERROR', 406); // 请求失败
+define('CODE_LOGOUT', 401); // 登录过期 提示过期后会重定向
+define('CODE_NOT_FOUND', 404); // 不存在
+     */
+    var ThinkPHP = window.Think = {
+      "ROOT": "__ROOT__",
+      "APP": "__APP__",
+      "PUBLIC": "__PUBLIC__",
+      "DEEP": "{:C('URL_PATHINFO_DEPR')}",
+      "MODEL": ["{:C('URL_MODEL')}", "{:C('URL_CASE_INSENSITIVE')}", "{:C('URL_HTML_SUFFIX')}"],
+      "VAR": ["{:C('VAR_MODULE')}", "{:C('VAR_CONTROLLER')}", "{:C('VAR_ACTION')}"],
+      CODE_SUCCESS: +'{$Think.CODE_SUCCESS}',
+      CODE_REDIRECT: +'{$Think.CODE_REDIRECT}',
+      CODE_ERROR: +'{$Think.CODE_ERROR}',
+      CODE_LOGOUT: +'{$Think.CODE_LOGOUT}',
+      CODE_NOT_FOUND: +'{$Think.CODE_NOT_FOUND}',
+      CODE_LOGIN_SUCCESS: +'{$Think.CODE_LOGIN_SUCCESS}',
+    }
+    // VUE组件存储对象
+    var COMPONENT = {}
+  </script>
+  <script type="text/javascript" src="__PUBLIC__/js/common.js?v={$V}"></script>
+  <script type="text/javascript" src="__DATA__/static/js/public.js?v={$V}"></script>
+  <script type="text/javascript" src="__DATA__/static/js/think.js?v={$V}"></script>
+  <script src="__MOMENT__"></script>
+  <script src="__APP_UTIL__"></script>
+  <!-- 头部js文件|自定义 -->
+  <block name="header_js"></block>
+</head>
+<body>
+<!--[if lt IE 9]>
+<div id="lt-ie-bg">
+  <div class="lt-ie-body">
+    <h1>系统提示</h1>
+    <div>
+      <p>IE9 以下访问可能不佳，推荐使用：Chrome / Firefox / Edge 等高级浏览器</p>
+    </div>
+  </div>
+</div>
+<style>
+  #lt-ie-bg{position: fixed;_position: absolute;z-index:9999999;top:0;right: 0;width: 100%;height: 100%;_height: expression(document.body.clientHeight);background:transparent;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#07057D,endColorstr=#4B7D0000);
+    zoom: 1;;display: inline-block;text-align: center;}
+  #lt-ie-bg .lt-ie-body{width: 400px;border-radius: 5px;text-align: center;background-color: #fff;margin: 15% auto 0 auto}
+  #lt-ie-bg .lt-ie-body h1{font-size:20px;line-height: 35px;background-color: #f2f2f2;}
+  #lt-ie-bg .lt-ie-body div{line-height: 25px;padding:15px 15px 25px 15px;}
+  #lt-ie-bg .lt-ie-body div p{line-height: 25px;padding:15px 0;}
+  #lt-ie-bg .lt-ie-body div a{border-radius: 3px;background-color: #0d9ae4;text-align: center;padding: 0 15px;height: 30px;line-height: 30px;color: #ffffff;display: inline-block;}
+</style>
+<![endif]-->
+<div class="body-main" style="height: 100%">
+  <div class="layui-form" style="height: 100%">
+    <block name="content"></block>
+    <script>
+      layui.use(['form', 'upload', 'layer', 'element'], function () {
+        var form = layui.form()
+          , jq = layui.jquery
+          , element = layui.element();
+      });//全局样式
+    </script>
+  </div>
+  <!--<div class="foot">点点全球租房_logov4.11 © 2014-2017     客服:400-670-2515 | 400-816-1525</div>-->
+</div>
+
+<!--region 底部JS-->
+<include file="Public/components/upload_file"/><!--上传文件组件-->
+<include file="Public/components/date_picker"/><!--日期选择器组件-->
+<include file="Public/components/datetime_range"/><!--日期范围选择器组件-->
+<include file="Public/components/pagination"/><!--分页组件-->
+<block name="footer_js"></block>
+<!--endregion-->
+
+</body>
+</html>
+<block name="out_foot">
+</block>
